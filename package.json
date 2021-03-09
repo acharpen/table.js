@@ -1,0 +1,53 @@
+{
+  "name": "@oorg/table.js",
+  "version": "0.0.1",
+  "license": "LGPL-3.0-or-later",
+  "description": "Virtual scroll table for JavaScript ecosystem",
+  "homepage": "https://github.com/acharpen/table.js",
+  "bugs": "https://github.com/acharpen/table.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acharpen/table.js.git"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "COPYING",
+    "COPYING.LESSER"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-typescript": "8.2.0",
+    "@testing-library/dom": "7.30.0",
+    "@testing-library/jest-dom": "5.11.9",
+    "@types/jest": "26.0.20",
+    "@types/node": "14.14.32",
+    "@typescript-eslint/eslint-plugin": "4.16.1",
+    "@typescript-eslint/parser": "4.16.1",
+    "eslint": "7.21.0",
+    "eslint-config-prettier": "8.1.0",
+    "eslint-plugin-jest": "24.1.7",
+    "eslint-plugin-prettier": "3.3.1",
+    "husky": "5.1.3",
+    "jest": "26.6.3",
+    "lint-staged": "10.5.4",
+    "parcel": "2.0.0-beta.1",
+    "prettier": "2.2.1",
+    "rollup": "2.40.0",
+    "rollup-plugin-terser": "7.0.2",
+    "sass": "1.32.8",
+    "ts-jest": "26.5.3",
+    "ts-node": "9.1.1",
+    "tslib": "2.1.0",
+    "typescript": "4.2.3"
+  },
+  "scripts": {
+    "bundle": "sh scripts/bundle.sh",
+    "lint": "sh scripts/lint.sh",
+    "start": "sh scripts/start.sh",
+    "test": "sh scripts/test.sh"
+  },
+  "lint-staged": {
+    "*.{html,js,json,md,scss,ts}": "prettier --write"
+  }
+}
