@@ -1,8 +1,13 @@
 import { ColumnWidthUnit } from './table-utils';
 
+type ColumnFormatter<T> =
+  | { type: 'link'; formatter: (item: T) => string; cache: boolean; callback: (item: T) => void }
+  | { type: 'text'; formatter: (item: T) => string; cache: boolean }
+  | { type: 'html'; formatter: (item: T) => DocumentFragment };
+
 export interface ColumnOptions<T> {
   align: 'center' | 'left' | 'right';
-  formatter: (item: T) => DocumentFragment;
+  formatFeature: ColumnFormatter<T>;
   id: number;
   order: number;
 

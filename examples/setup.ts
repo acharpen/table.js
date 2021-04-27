@@ -7,25 +7,8 @@ export interface ExampleObject {
 
 // ////////////////////////////////////////////////////////////////////////////
 
-const defaultFormatter = (field: keyof ExampleObject): ((obj: ExampleObject) => DocumentFragment) => {
-  return (obj: ExampleObject): DocumentFragment => {
-    const fragment = document.createDocumentFragment();
-    fragment.textContent = obj[field];
-
-    return fragment;
-  };
-};
-
-const linkFormatter = (field: keyof ExampleObject): ((obj: ExampleObject) => DocumentFragment) => {
-  return (obj: ExampleObject): DocumentFragment => {
-    const fragment = document.createDocumentFragment();
-
-    const elt = document.createElement('a');
-    elt.textContent = obj[field];
-    fragment.appendChild(elt);
-
-    return fragment;
-  };
+const defaultFormatter = (field: keyof ExampleObject): ((obj: ExampleObject) => string) => {
+  return (obj: ExampleObject): string => obj[field];
 };
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -33,7 +16,7 @@ const linkFormatter = (field: keyof ExampleObject): ((obj: ExampleObject) => Doc
 export const columnOptions = [
   {
     align: 'left' as const,
-    formatter: linkFormatter('col1'),
+    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col1'), cache: true },
     id: 1,
     order: 1,
     pinned: 'left' as const,
@@ -44,7 +27,7 @@ export const columnOptions = [
   },
   {
     align: 'right' as const,
-    formatter: defaultFormatter('col2'),
+    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col2'), cache: true },
     id: 2,
     order: 2,
     resizable: true,
@@ -54,7 +37,7 @@ export const columnOptions = [
   },
   {
     align: 'left' as const,
-    formatter: defaultFormatter('col3'),
+    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col3'), cache: true },
     id: 3,
     order: 3,
     resizable: true,
@@ -64,7 +47,7 @@ export const columnOptions = [
   },
   {
     align: 'left' as const,
-    formatter: defaultFormatter('col4'),
+    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col4'), cache: true },
     id: 4,
     order: 4,
     resizable: true,
