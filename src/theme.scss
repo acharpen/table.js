@@ -45,6 +45,16 @@ $table-header-height: 40px;
   background-color: var(--oo-table-color-text-primary);
 }
 
+.oo-table-body .oo-table-cell-content a,
+.oo-table-body .oo-table-row-actions-handle,
+.oo-table-cell-tick i,
+.oo-table-expand-toggler,
+.oo-table-header .oo-table-cell,
+.oo-table-header .oo-table-cell-tick,
+.oo-table-overlay ul li.oo-table-list-item {
+  cursor: pointer;
+}
+
 .oo-table-body .oo-table-row:hover .oo-table-cell,
 .oo-table-body .oo-table-row:hover .oo-table-cell-tick,
 .oo-table-body .oo-table-row:hover .oo-table-row-actions-handle,
@@ -79,14 +89,6 @@ $table-header-height: 40px;
 .oo-table-row-actions-handle i::after,
 .oo-table-row-actions-handle i::before {
   background-color: var(--oo-table-color-border-primary);
-}
-
-.oo-table-body .oo-table-row-actions-handle,
-.oo-table-expand-toggler,
-.oo-table-header .oo-table-cell,
-.oo-table-header .oo-table-cell-tick,
-.oo-table-overlay ul li.oo-table-list-item {
-  cursor: pointer;
 }
 
 .oo-table-body .oo-table-row-actions-handle,
@@ -178,6 +180,7 @@ $table-header-height: 40px;
 
 .oo-table-cell-content {
   flex-grow: 1;
+  line-height: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -305,7 +308,6 @@ $table-header-height: 40px;
   .oo-table-cell-content {
     a {
       color: var(--oo-table-color-text-link);
-      cursor: pointer;
 
       &:hover {
         text-decoration: underline;
