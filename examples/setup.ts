@@ -7,8 +7,31 @@ export interface ExampleObject {
 
 // ////////////////////////////////////////////////////////////////////////////
 
-const defaultFormatter = (field: keyof ExampleObject): ((obj: ExampleObject) => string) => {
-  return (obj: ExampleObject): string => obj[field];
+const createLinkElt = ({ getItem }: { getItem: () => ExampleObject }): HTMLElement => {
+  const elt = document.createElement('a');
+  elt.addEventListener('mouseup', (event) => {
+    event.stopPropagation();
+
+    console.log(getItem());
+  });
+
+  return elt;
+};
+
+const updateLinkElt = (
+  field: keyof ExampleObject
+): ((elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }) => void) => {
+  return (elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }): void => {
+    elt.firstElementChild.textContent = getItem()[field];
+  };
+};
+
+const updateTextElt = (
+  field: keyof ExampleObject
+): ((elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }) => void) => {
+  return (elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }): void => {
+    elt.textContent = getItem()[field];
+  };
 };
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -16,7 +39,7 @@ const defaultFormatter = (field: keyof ExampleObject): ((obj: ExampleObject) => 
 export const columnOptions = [
   {
     align: 'left' as const,
-    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col1'), cache: true },
+    formatter: { create: createLinkElt, update: updateLinkElt('col1') },
     id: 1,
     order: 1,
     pinned: 'left' as const,
@@ -27,7 +50,7 @@ export const columnOptions = [
   },
   {
     align: 'right' as const,
-    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col2'), cache: true },
+    formatter: { update: updateTextElt('col2') },
     id: 2,
     order: 2,
     resizable: true,
@@ -37,7 +60,7 @@ export const columnOptions = [
   },
   {
     align: 'left' as const,
-    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col3'), cache: true },
+    formatter: { update: updateTextElt('col3') },
     id: 3,
     order: 3,
     resizable: true,
@@ -47,7 +70,7 @@ export const columnOptions = [
   },
   {
     align: 'left' as const,
-    formatFeature: { type: 'text' as const, formatter: defaultFormatter('col4'), cache: true },
+    formatter: { update: updateTextElt('col4') },
     id: 4,
     order: 4,
     resizable: true,

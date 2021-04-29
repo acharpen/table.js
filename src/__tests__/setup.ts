@@ -7,15 +7,10 @@ export interface TestObject {
 
 // ////////////////////////////////////////////////////////////////////////////
 
-export const defaultFormatter = (field: keyof TestObject): ((obj: TestObject) => DocumentFragment) => {
-  return (obj: TestObject): DocumentFragment => {
-    const fragment = document.createDocumentFragment();
-
-    const value = obj[field];
-    if (value != null) {
-      fragment.textContent = value;
-    }
-
-    return fragment;
+export const updateTextElt = (
+  field: keyof TestObject
+): ((elt: HTMLElement, { getItem }: { getItem: () => TestObject }) => void) => {
+  return (elt: HTMLElement, { getItem }: { getItem: () => TestObject }): void => {
+    elt.textContent = getItem()[field] ?? '';
   };
 };

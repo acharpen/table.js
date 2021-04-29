@@ -64,10 +64,6 @@ export abstract class AbstractTable<T> {
   public deleteNodes(nodeIds: number[]): void {
     this.nodes = this.nodes.filter((node) => !nodeIds.includes(node.id));
 
-    this.getColumnsWithDisplayedValuesCache().forEach((column) => {
-      nodeIds.forEach((nodeId) => column.cache.displayedValues.delete(nodeId));
-    });
-
     this.updateNodes();
   }
 
@@ -133,7 +129,7 @@ export abstract class AbstractTable<T> {
 
   // ////////////////////////////////////////////////////////////////////////////
 
-  protected createTableBodyCellElt(column: Column<T>, _ctx: { nodeIndex: number }): HTMLElement {
+  protected createTableBodyCellElt(column: Column<T>, ctx: { nodeIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CLS);
     if (column.classList) elt.classList.add(...column.classList);
     if (column.sorter) elt.classList.add(TableUtils.SORTABLE_CLS);
@@ -152,7 +148,7 @@ export abstract class AbstractTable<T> {
       }
     }
 
-    elt.appendChild(this.createTableBodyCellContentElt(column));
+    elt.appendChild(this.createTableBodyCellContentElt(column, ctx));
 
     return elt;
   }
@@ -306,8 +302,13 @@ export abstract class AbstractTable<T> {
     return elt;
   }
 
-  private createTableBodyCellContentElt(column: Column<T>): HTMLElement {
-    return DomUtils.createElt('div', TableUtils.TABLE_CELL_CONTENT_CLS, TableUtils.getTextAlignCls(column.align));
+  private createTableBodyCellContentElt(column: Column<T>, ctx: { nodeIndex: number }): HTMLElement {
+    const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CONTENT_CLS, TableUtils.getTextAlignCls(column.align));
+    if (column.formatter.create) {
+      elt.appendChild(column.formatter.create({ getItem: () => this.getNodeByIndex(ctx.nodeIndex).value }));
+    }
+
+    return elt;
   }
 
   private createTableBodyElt(): HTMLElement {
@@ -450,13 +451,6 @@ export abstract class AbstractTable<T> {
     };
   }
 
-  private getColumnsWithDisplayedValuesCache(): Column<T>[] {
-    return this.dataColumns.filter(
-      (column) =>
-        (column.formatFeature.type === 'link' || column.formatFeature.type === 'text') && column.formatFeature.cache
-    );
-  }
-
   private getNodesById(ids: number[]): Node<T>[] {
     return ids.map((id) => this.nodes.find((node) => node.id === id)).filter((node) => node) as Node<T>[];
   }
@@ -541,7 +535,7 @@ export abstract class AbstractTable<T> {
 
   private initColumnOptions(columnOptions: ColumnOptions<T>[]): Column<T>[] {
     return columnOptions
-      .map((column) => ({ ...column, cache: { displayedValues: new Map() }, sortOrder: 'default' as const }))
+      .map((column) => ({ ...column, sortOrder: 'default' as const }))
       .sort((a, b) => {
         if (a.pinned === 'left' && b.pinned !== 'left') return -1;
         else if (b.pinned === 'left' && a.pinned !== 'left') return 1;
@@ -676,33 +670,7 @@ export abstract class AbstractTable<T> {
   }
 
   private populateCellContent(cellElt: HTMLElement, column: Column<T>, node: Node<T>): void {
-    const cellContentElt = cellElt.lastElementChild as HTMLElement;
-
-    switch (column.formatFeature.type) {
-      case 'link':
-      case 'text': {
-        if (column.formatFeature.cache) {
-          if (column.cache.displayedValues.has(node.id)) {
-            cellContentElt.textContent = column.cache.displayedValues.get(node.id) as string;
-          } else {
-            const displayedValue = column.formatFeature.formatter(node.value);
-            column.cache.displayedValues.set(node.id, displayedValue);
-            cellContentElt.textContent = displayedValue;
-          }
-        } else {
-          cellContentElt.textContent = column.formatFeature.formatter(node.value);
-        }
-        break;
-      }
-
-      default: {
-        const fragment = column.formatFeature.formatter(node.value);
-        if (fragment.childElementCount > 0) {
-          cellContentElt.innerHTML = '';
-          cellContentElt.appendChild(fragment);
-        } else cellContentElt.textContent = fragment.textContent;
-      }
-    }
+    column.formatter.update(cellElt.lastElementChild as HTMLElement, { getItem: () => node.value });
   }
 
   private populateVisibleNodes(): void {

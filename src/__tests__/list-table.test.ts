@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
-import { TestObject, defaultFormatter } from './setup';
+import { TestObject, updateTextElt } from './setup';
 import { ListTable } from '../list-table';
 import { getByText } from '@testing-library/dom';
 
 const columnOptions = [
-  { align: 'left' as const, formatter: defaultFormatter('col1'), id: 1, order: 1, title: 'col1' },
-  { align: 'left' as const, formatter: defaultFormatter('col2'), id: 2, order: 2, title: 'col2' }
+  { align: 'left' as const, formatter: { update: updateTextElt('col1') }, id: 1, order: 1, title: 'col1' },
+  { align: 'left' as const, formatter: { update: updateTextElt('col2') }, id: 2, order: 2, title: 'col2' }
 ];
 const tableOptions = { columnMinWidth: 40, nodeHeight: 40, visibleNodes: 10 };
 const table = new ListTable<TestObject>(document.body, { columnOptions, tableOptions });

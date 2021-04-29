@@ -14,6 +14,7 @@ $table-header-height: 40px;
   --oo-table-color-border-primary: #d1d5db;
   --oo-table-color-border-secondary: #f3f4f6;
   --oo-table-color-box-header-blue-bg: #eff6ff;
+  --oo-table-color-text-link: #0366d6;
   --oo-table-color-text-primary: #4b5563;
 }
 
@@ -299,6 +300,17 @@ $table-header-height: 40px;
   .oo-table-row-actions-handle {
     background-color: var(--oo-table-color-bg-primary); // mandatory
     box-shadow: inset 0 -1px 0 0 var(--oo-table-color-border-secondary);
+  }
+
+  .oo-table-cell-content {
+    a {
+      color: var(--oo-table-color-text-link);
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   .oo-table-sticky-leftmost {
