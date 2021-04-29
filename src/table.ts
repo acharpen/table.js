@@ -683,7 +683,7 @@ export abstract class AbstractTable<T> {
       const node = this.getNodeByIndex(i);
       const nodeElt = this.tableBodyRowElts[i];
       const cellElts = this.getDataCellElts(nodeElt);
-      const rowColor = this.options.rowColor?.(node.value);
+      const rowColor = this.options.rowColor?.(node.value, (this.currentRangeStart ?? 0) + i);
 
       for (let j = 0; j < columnsLength; j++) {
         const cellElt = cellElts[j];

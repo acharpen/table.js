@@ -4,7 +4,7 @@ export interface TableOptions<T> {
   visibleNodes: number;
 
   rowActions?: { callback: (item: T) => void; label: string }[][];
-  rowColor?: (item: T) => { backgroundColor?: string; color?: string } | null;
+  rowColor?: (item: T, index: number) => { backgroundColor?: string; color?: string } | null;
   selectable?: boolean | number;
 }
 
