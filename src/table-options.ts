@@ -4,6 +4,7 @@ export interface TableOptions<T> {
   visibleNodes: number;
 
   rowActions?: { callback: (item: T) => void; label: string }[][];
+  rowClassList?: (item: T, rowIndex: number) => string[];
   selectable?: boolean | number;
 }
 

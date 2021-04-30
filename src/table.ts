@@ -687,6 +687,9 @@ export abstract class AbstractTable<T> {
       const cellElts = this.getDataCellElts(nodeElt);
       const rowIndex = (this.currRangeStart ?? 0) + i;
 
+      // Update node styles
+      this.replaceCustomClassList(nodeElt, this.options.rowClassList?.(node.value, rowIndex));
+
       for (let j = 0; j < columnsLength; j++) {
         const cellElt = cellElts[j];
         const column = this.dataColumns[j];
