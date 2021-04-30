@@ -132,7 +132,6 @@ export abstract class AbstractTable<T> {
 
   protected createTableBodyCellElt(column: Column<T>, ctx: { nodeIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CLS);
-    if (column.classList) elt.classList.add(...column.classList);
     if (column.sorter) elt.classList.add(TableUtils.SORTABLE_CLS);
     if (column.pinned != null) {
       const targetColumnIndex = this.dataColumns.findIndex((_column) => _column.id === column.id);
@@ -380,7 +379,6 @@ export abstract class AbstractTable<T> {
   private createTableHeaderCellElt(column: Column<T>, ctx: { columnIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CLS);
     elt.addEventListener('mouseup', () => this.onClickTableHeaderCell(ctx.columnIndex), false);
-    if (column.classList) elt.classList.add(...column.classList);
     if (column.pinned != null) elt.classList.add(TableUtils.STICKY_CLS);
 
     elt.appendChild(this.createTableHeaderCellContentElt(column, ctx));
@@ -680,7 +678,6 @@ export abstract class AbstractTable<T> {
 
   private populateVisibleNodes(): void {
     const columnsLength = this.dataColumns.length;
-    const defaultCellColor = { backgroundColor: '', color: '' };
 
     for (let i = 0, len = this.visibleNodeIndexes.length; i < len; i++) {
       this.tableBodyRowElts[i].classList.remove(TableUtils.HIDDEN_CLS);
@@ -688,7 +685,7 @@ export abstract class AbstractTable<T> {
       const node = this.getNodeByIndex(i);
       const nodeElt = this.tableBodyRowElts[i];
       const cellElts = this.getDataCellElts(nodeElt);
-      const rowColor = this.options.rowColor?.(node.value, (this.currRangeStart ?? 0) + i);
+      const rowIndex = (this.currRangeStart ?? 0) + i;
 
       for (let j = 0; j < columnsLength; j++) {
         const cellElt = cellElts[j];
@@ -696,16 +693,24 @@ export abstract class AbstractTable<T> {
 
         this.populateCellContent(cellElt, column, node, i);
 
-        // Update cell color
-        const cellColor = column.cellColor?.(node.value) ?? rowColor ?? defaultCellColor;
-        cellElt.style.backgroundColor = cellColor.backgroundColor ?? cellElt.style.backgroundColor;
-        cellElt.style.color = cellColor.color ?? cellElt.style.color;
+        // Update cell styles
+        this.replaceCustomClassList(cellElt, column.classList?.(node.value, rowIndex));
       }
 
       // Update selection
       if (node.isSelected) nodeElt.classList.add(TableUtils.SELECTED_CLS);
       else nodeElt.classList.remove(TableUtils.SELECTED_CLS);
     }
+  }
+
+  private replaceCustomClassList(elt: HTMLElement, classList: string[] = []): void {
+    const prevClassList: string[] = [];
+    elt.classList.forEach((token) => {
+      if (!token.startsWith(TableUtils.VENDOR_CLS)) prevClassList.push(token);
+    });
+
+    elt.classList.remove(...prevClassList);
+    elt.classList.add(...classList);
   }
 
   private setActiveNodeIndexes(): void {

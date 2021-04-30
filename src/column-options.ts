@@ -9,8 +9,7 @@ export interface ColumnOptions<T> {
   id: number;
   order: number;
 
-  cellColor?: (item: T) => { backgroundColor?: string; color?: string } | null;
-  classList?: string[];
+  classList?: (item: T, rowIndex: number) => string[];
   pinned?: 'left' | 'right';
   resizable?: boolean;
   sorter?: (a: T, b: T) => number;
