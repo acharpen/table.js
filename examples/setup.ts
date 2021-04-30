@@ -20,17 +20,23 @@ const createLinkElt = ({ getItem }: { getItem: () => ExampleObject }): HTMLEleme
 
 const updateLinkElt = (
   field: keyof ExampleObject
-): ((elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }) => void) => {
-  return (elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }): void => {
-    elt.firstElementChild.textContent = getItem()[field];
+): ((elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }) => void) => {
+  return (elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }): void => {
+    const displayedValue = item[field];
+    const prevDisplayedValue = prevItem?.[field];
+
+    if (displayedValue !== prevDisplayedValue) elt.firstElementChild.textContent = displayedValue;
   };
 };
 
 const updateTextElt = (
   field: keyof ExampleObject
-): ((elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }) => void) => {
-  return (elt: HTMLElement, { getItem }: { getItem: () => ExampleObject }): void => {
-    elt.textContent = getItem()[field];
+): ((elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }) => void) => {
+  return (elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }): void => {
+    const displayedValue = item[field];
+    const prevDisplayedValue = prevItem?.[field];
+
+    if (displayedValue !== prevDisplayedValue) elt.textContent = displayedValue;
   };
 };
 

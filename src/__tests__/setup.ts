@@ -9,8 +9,8 @@ export interface TestObject {
 
 export const updateTextElt = (
   field: keyof TestObject
-): ((elt: HTMLElement, { getItem }: { getItem: () => TestObject }) => void) => {
-  return (elt: HTMLElement, { getItem }: { getItem: () => TestObject }): void => {
-    elt.textContent = getItem()[field] ?? '';
+): ((elt: HTMLElement, { item }: { item: TestObject }) => void) => {
+  return (elt: HTMLElement, { item }: { item: TestObject }): void => {
+    elt.textContent = item[field] ?? '';
   };
 };

@@ -27,9 +27,10 @@ export abstract class AbstractTable<T> {
   private readonly tickCellWidth: number;
   private activeNodeIndexes: number[];
   private counter: number;
-  private currentFilter: { matcher: (value: T) => boolean } | null;
-  private currentRangeStart: number | null;
-  private currentSort: { column: Column<T>; sorter: (a: T, b: T) => number; sortOrder: SortOrder } | null;
+  private currFilter: { matcher: (value: T) => boolean } | null;
+  private currRangeStart: number | null;
+  private currSort: { column: Column<T>; sorter: (a: T, b: T) => number; sortOrder: SortOrder } | null;
+  private prevRangeStart: number | null;
 
   protected constructor(
     containerElt: HTMLElement,
@@ -38,12 +39,13 @@ export abstract class AbstractTable<T> {
     this.activeNodeIndexes = [];
     this.containerElt = containerElt;
     this.counter = 0;
-    this.currentFilter = null;
-    this.currentRangeStart = null;
-    this.currentSort = null;
+    this.currFilter = null;
+    this.currRangeStart = null;
+    this.currSort = null;
     this.dataColumns = this.initColumnOptions(columnOptions);
     this.nodes = [];
     this.options = tableOptions;
+    this.prevRangeStart = null;
     this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING * 2;
     this.visibleNodeIndexes = [];
 
@@ -81,7 +83,7 @@ export abstract class AbstractTable<T> {
   }
 
   public filter(matcher: (value: T) => boolean): void {
-    this.currentFilter = { matcher };
+    this.currFilter = { matcher };
 
     this.updateNodes({ performFiltering: true });
   }
@@ -112,8 +114,7 @@ export abstract class AbstractTable<T> {
     const targetColumn = this.dataColumns.find((column) => column.id === columnId);
 
     if (targetColumn?.sorter != null) {
-      this.currentSort =
-        sortOrder === 'default' ? null : { sortOrder, column: targetColumn, sorter: targetColumn.sorter };
+      this.currSort = sortOrder === 'default' ? null : { sortOrder, column: targetColumn, sorter: targetColumn.sorter };
 
       this.updateNodes({ performSorting: true });
     }
@@ -184,8 +185,8 @@ export abstract class AbstractTable<T> {
   }
 
   protected setNodes(nodes: Node<T>[]): void {
-    this.currentFilter = null;
-    this.currentSort = null;
+    this.currFilter = null;
+    this.currSort = null;
     this.nodes = nodes;
 
     this.resetColumnSortHandles();
@@ -205,8 +206,9 @@ export abstract class AbstractTable<T> {
   protected updateVisibleNodes(force = false): void {
     const newRangeStart = Math.floor(this.tableElt.scrollTop / this.options.nodeHeight);
 
-    if (force || newRangeStart !== this.currentRangeStart) {
-      this.currentRangeStart = newRangeStart;
+    if (force || newRangeStart !== this.currRangeStart) {
+      this.prevRangeStart = this.currRangeStart;
+      this.currRangeStart = newRangeStart;
       this.tableBodyElt.style.transform = `translateY(${DomUtils.withPx(newRangeStart * this.options.nodeHeight)})`;
       this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.virtualNodesCount);
 
@@ -456,13 +458,13 @@ export abstract class AbstractTable<T> {
   }
 
   private handleFilter(): void {
-    if (this.currentFilter) {
+    if (this.currFilter) {
       const nodesLength = this.nodes.length;
 
       for (let i = nodesLength - 1; i >= 0; i--) {
         const node = this.nodes[i];
 
-        node.isMatching = this.currentFilter.matcher(node.value);
+        node.isMatching = this.currFilter.matcher(node.value);
 
         if (!node.isMatching && !node.isLeaf) {
           let nextnodeIndex = i + 1;
@@ -485,10 +487,10 @@ export abstract class AbstractTable<T> {
 
     this.resetColumnSortHandles();
 
-    if (!this.currentSort) sortedNodes = this.nodes.sort((a, b) => a.initialPos - b.initialPos);
+    if (!this.currSort) sortedNodes = this.nodes.sort((a, b) => a.initialPos - b.initialPos);
     else {
-      const currentSort = this.currentSort;
-      const orderedSort = (a: T, b: T): number => currentSort.sorter(a, b) * (currentSort.sortOrder === 'asc' ? 1 : -1);
+      const currSort = this.currSort;
+      const orderedSort = (a: T, b: T): number => currSort.sorter(a, b) * (currSort.sortOrder === 'asc' ? 1 : -1);
       const nodesLength = this.nodes.length;
       const rootNodes = [];
       const sortedChildrenByParentNodeId = new Map<number, Node<T>[]>();
@@ -521,7 +523,7 @@ export abstract class AbstractTable<T> {
         Array.prototype.push.apply(stack, sortedChildrenByParentNodeId.get(node.id) as Node<T>[]);
       }
 
-      this.setColumnSortOrder(currentSort.column, currentSort.sortOrder);
+      this.setColumnSortOrder(currSort.column, currSort.sortOrder);
     }
 
     return sortedNodes;
@@ -609,9 +611,9 @@ export abstract class AbstractTable<T> {
   private onClickTableHeaderCell(columnIndex: number): void {
     const column = this.dataColumns[columnIndex];
     const sortOrder =
-      !this.currentSort || this.currentSort.column.id !== column.id
+      !this.currSort || this.currSort.column.id !== column.id
         ? 'asc'
-        : this.currentSort.sortOrder === 'asc'
+        : this.currSort.sortOrder === 'asc'
         ? 'desc'
         : 'default';
     this.sort(column.id, sortOrder);
@@ -666,11 +668,14 @@ export abstract class AbstractTable<T> {
   }
 
   private onSortTable(columnIndex: number, sortOrder: SortOrder): void {
-    this.sort(this.dataColumns[columnIndex].id, sortOrder === this.currentSort?.sortOrder ? 'default' : sortOrder);
+    this.sort(this.dataColumns[columnIndex].id, sortOrder === this.currSort?.sortOrder ? 'default' : sortOrder);
   }
 
-  private populateCellContent(cellElt: HTMLElement, column: Column<T>, node: Node<T>): void {
-    column.formatter.update(cellElt.lastElementChild as HTMLElement, { getItem: () => node.value });
+  private populateCellContent(cellElt: HTMLElement, column: Column<T>, node: Node<T>, nodeIndex: number): void {
+    column.formatter.update(cellElt.lastElementChild as HTMLElement, {
+      item: node.value,
+      prevItem: this.prevRangeStart != null ? this.nodes[this.prevRangeStart + nodeIndex]?.value : null
+    });
   }
 
   private populateVisibleNodes(): void {
@@ -683,13 +688,13 @@ export abstract class AbstractTable<T> {
       const node = this.getNodeByIndex(i);
       const nodeElt = this.tableBodyRowElts[i];
       const cellElts = this.getDataCellElts(nodeElt);
-      const rowColor = this.options.rowColor?.(node.value, (this.currentRangeStart ?? 0) + i);
+      const rowColor = this.options.rowColor?.(node.value, (this.currRangeStart ?? 0) + i);
 
       for (let j = 0; j < columnsLength; j++) {
         const cellElt = cellElts[j];
         const column = this.dataColumns[j];
 
-        this.populateCellContent(cellElt, column, node);
+        this.populateCellContent(cellElt, column, node, i);
 
         // Update cell color
         const cellColor = column.cellColor?.(node.value) ?? rowColor ?? defaultCellColor;
