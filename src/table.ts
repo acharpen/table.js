@@ -697,7 +697,7 @@ export abstract class AbstractTable<T> {
         this.populateCellContent(cellElt, column, node, i);
 
         // Update cell styles
-        this.replaceCustomClassList(cellElt, column.classList?.(node.value, rowIndex));
+        this.replaceCustomClassList(cellElt, column.cellClassList?.(node.value, rowIndex));
       }
 
       // Update selection
