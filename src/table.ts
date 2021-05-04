@@ -366,7 +366,7 @@ export abstract class AbstractTable<T> {
   }
 
   private createTableElt(): HTMLElement {
-    const elt = DomUtils.createElt('div', TableUtils.TABLE_CLS);
+    const elt = DomUtils.createElt('div', TableUtils.TABLE_CLS, ...(this.options.classList ?? []));
     elt.addEventListener('scroll', () => requestAnimationFrame(() => this.updateVisibleNodes()));
 
     elt.appendChild(this.tableHeaderElt);

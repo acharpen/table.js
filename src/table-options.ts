@@ -3,6 +3,7 @@ export interface TableOptions<T> {
   nodeHeight: number;
   visibleNodes: number;
 
+  classList?: string[];
   rowActions?: { callback: (item: T) => void; label: string }[][];
   rowClassList?: (item: T, rowIndex: number) => string[];
   selectable?: boolean | number;

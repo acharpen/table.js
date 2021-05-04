@@ -87,6 +87,7 @@ export const columnOptions = [
 ];
 
 export const tableOptions = {
+  classList: ['oo-table-line-divisions'],
   columnMinWidth: 40,
   nodeHeight: 40,
   rowActions: [
