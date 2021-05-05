@@ -230,6 +230,7 @@ $table-header-height: 40px;
 .oo-table-header {
   .oo-table-cell,
   .oo-table-cell-tick,
+  .oo-table-row,
   .oo-table-row-actions-handle {
     background-color: var(--oo-table-color-box-header-blue-bg); // mandatory
   }
@@ -304,8 +305,6 @@ $table-header-height: 40px;
 /* Body ******************************************************************** */
 
 .oo-table-body {
-  top: $table-header-height; // mandatory
-
   .oo-table-cell,
   .oo-table-cell-tick,
   .oo-table-row-actions-handle {

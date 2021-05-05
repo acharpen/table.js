@@ -30,13 +30,9 @@
 
 /* Body ******************************************************************** */
 
-.oo-table-body,
-.oo-table-virtual-scroll-spacer {
-  position: absolute;
-}
-
 .oo-table-body {
   contain: content;
+  width: fit-content;
 
   .oo-table-row.oo-table-hidden {
     display: none;
@@ -57,6 +53,7 @@
 
 .oo-table-virtual-scroll-spacer {
   left: 0;
+  position: absolute;
   top: 0;
   transform-origin: 0 0;
   width: 1px;
