@@ -6,8 +6,6 @@ import { Node } from './node';
 import { TableOptions } from './table-options';
 
 export abstract class AbstractTable<T> {
-  private static readonly VIRTUAL_SCROLL_PADDING: number = 2;
-
   protected readonly containerElt: HTMLElement;
   protected readonly tableBodyElt: HTMLElement;
   protected readonly tableBodyRowElts: HTMLElement[];
@@ -17,7 +15,6 @@ export abstract class AbstractTable<T> {
   protected readonly virtualScrollSpacerElt: HTMLElement;
 
   protected readonly options: TableOptions<T>;
-  protected readonly virtualNodesCount: number;
   protected dataColumns: Column<T>[];
   protected nodes: Node<T>[];
   protected visibleNodeIndexes: number[];
@@ -46,7 +43,6 @@ export abstract class AbstractTable<T> {
     this.nodes = [];
     this.options = tableOptions;
     this.prevRangeStart = null;
-    this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING * 2;
     this.visibleNodeIndexes = [];
 
     this.virtualScrollSpacerElt = this.createVirtualScrollSpacerElt();
@@ -209,7 +205,7 @@ export abstract class AbstractTable<T> {
       this.prevRangeStart = this.currRangeStart;
       this.currRangeStart = newRangeStart;
       this.tableBodyElt.style.transform = `translateY(${DomUtils.withPx(newRangeStart * this.options.nodeHeight)})`;
-      this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.virtualNodesCount);
+      this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.options.visibleNodes);
 
       this.hideUnusedTableBodyRowElts();
       this.populateVisibleNodes();
@@ -354,7 +350,7 @@ export abstract class AbstractTable<T> {
   }
 
   private createTableBodyRowElts(): HTMLElement[] {
-    return [...Array(this.virtualNodesCount).keys()].map((_, i) => this.createTableBodyRowElt({ nodeIndex: i }));
+    return [...Array(this.options.visibleNodes).keys()].map((_, i) => this.createTableBodyRowElt({ nodeIndex: i }));
   }
 
   private createTableBodyTickElt(): HTMLElement {
