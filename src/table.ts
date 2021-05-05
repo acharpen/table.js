@@ -202,7 +202,7 @@ export abstract class AbstractTable<T> {
     const newRangeStart = Math.floor(this.tableElt.scrollTop / this.options.nodeHeight);
 
     if (force || newRangeStart !== this.currRangeStart) {
-      this.prevRangeStart = this.currRangeStart;
+      this.prevRangeStart = force ? null : this.currRangeStart;
       this.currRangeStart = newRangeStart;
       this.tableBodyElt.style.transform = `translateY(${DomUtils.withPx(newRangeStart * this.options.nodeHeight)})`;
       this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.options.visibleNodes);
