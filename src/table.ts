@@ -128,7 +128,6 @@ export abstract class AbstractTable<T> {
 
   protected createTableBodyCellElt(column: Column<T>, ctx: { nodeIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CLS);
-    if (column.sorter) elt.classList.add(TableUtils.SORTABLE_CLS);
     if (column.pinned != null) {
       const targetColumnIndex = this.dataColumns.findIndex((_column) => _column.id === column.id);
 
@@ -379,7 +378,6 @@ export abstract class AbstractTable<T> {
 
     elt.appendChild(this.createTableHeaderCellContentElt(column, ctx));
 
-    if (column.sorter) elt.classList.add(TableUtils.SORTABLE_CLS);
     if (column.resizable != null) elt.appendChild(this.createResizeHandleElt(ctx));
 
     return elt;
@@ -389,11 +387,7 @@ export abstract class AbstractTable<T> {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CONTENT_CLS, TableUtils.getTextAlignCls(column.align));
     elt.textContent = column.title ?? '';
 
-    if (column.sorter) {
-      elt.classList.add(TableUtils.SORTABLE_CLS);
-
-      elt.appendChild(this.createSortHandlesElt(ctx));
-    }
+    if (column.sorter) elt.appendChild(this.createSortHandlesElt(ctx));
 
     return elt;
   }

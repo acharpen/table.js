@@ -15,7 +15,6 @@ export class TableUtils {
   public static readonly SORT_ASC_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-sort-asc-handle`;
   public static readonly SORT_DESC_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-sort-desc-handle`;
   public static readonly SORT_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-sort-handle`;
-  public static readonly SORTABLE_CLS: string = `${TableUtils.VENDOR_CLS}-sortable`;
   public static readonly STICKY_CLS: string = `${TableUtils.VENDOR_CLS}-sticky`;
   public static readonly STICKY_LEFTMOST_CLS: string = `${TableUtils.VENDOR_CLS}-sticky-leftmost`;
   public static readonly STICKY_RIGHTMOST_CLS: string = `${TableUtils.VENDOR_CLS}-sticky-rightmost`;
@@ -25,7 +24,6 @@ export class TableUtils {
   public static readonly TABLE_CELL_TICK_CLS: string = `${TableUtils.VENDOR_CLS}-cell-tick`;
   public static readonly TABLE_CLS: string = TableUtils.VENDOR_CLS;
   public static readonly TABLE_HEADER_CLS: string = `${TableUtils.VENDOR_CLS}-header`;
-  public static readonly TABLE_ROW_ACTIONS_CLS: string = `${TableUtils.VENDOR_CLS}-row-actions`;
   public static readonly TABLE_ROW_ACTIONS_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-row-actions-handle`;
   public static readonly TABLE_ROW_CLS: string = `${TableUtils.VENDOR_CLS}-row`;
   public static readonly VIRTUAL_SCROLL_SPACER_CLS: string = `${TableUtils.VENDOR_CLS}-virtual-scroll-spacer`;
