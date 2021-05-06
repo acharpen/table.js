@@ -6,21 +6,24 @@ import { Node } from './node';
 import { TableOptions } from './table-options';
 
 export abstract class AbstractTable<T> {
+  private static readonly VIRTUAL_SCROLL_PADDING: number = 1;
+
   protected readonly containerElt: HTMLElement;
   protected readonly tableBodyElt: HTMLElement;
   protected readonly tableBodyRowElts: HTMLElement[];
+  protected readonly tableBodyWrapperElt: HTMLElement;
   protected readonly tableElt: HTMLElement;
   protected readonly tableHeaderElt: HTMLElement;
   protected readonly tableHeaderRowElt: HTMLElement;
   protected readonly virtualScrollSpacerElt: HTMLElement;
 
   protected readonly options: TableOptions<T>;
+  protected readonly virtualNodesCount: number;
   protected dataColumns: Column<T>[];
   protected nodes: Node<T>[];
   protected visibleNodeIndexes: number[];
 
   private readonly rowActionsHandleCellWidth: number;
-  private readonly tableHeaderHeight: number;
   private readonly tickCellWidth: number;
   private activeNodeIndexes: number[];
   private counter: number;
@@ -43,17 +46,18 @@ export abstract class AbstractTable<T> {
     this.nodes = [];
     this.options = tableOptions;
     this.prevRangeStart = null;
+    this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING;
     this.visibleNodeIndexes = [];
 
     this.virtualScrollSpacerElt = this.createVirtualScrollSpacerElt();
     this.tableBodyRowElts = this.createTableBodyRowElts();
     this.tableBodyElt = this.createTableBodyElt();
+    this.tableBodyWrapperElt = this.createTableBodyWrapperElt();
     this.tableHeaderRowElt = this.createTableHeaderRowElt();
     this.tableHeaderElt = this.createTableHeaderElt();
     this.tableElt = this.createTableElt();
 
     this.rowActionsHandleCellWidth = this.computeRowActionsHandleCellWidth();
-    this.tableHeaderHeight = DomUtils.getRenderedSize(this.containerElt, this.tableHeaderElt).height;
     this.tickCellWidth = this.computeTickCellWidth();
   }
 
@@ -204,7 +208,7 @@ export abstract class AbstractTable<T> {
       this.prevRangeStart = force ? null : this.currRangeStart;
       this.currRangeStart = newRangeStart;
       this.tableBodyElt.style.transform = `translateY(${DomUtils.withPx(newRangeStart * this.options.nodeHeight)})`;
-      this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.options.visibleNodes);
+      this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.virtualNodesCount);
 
       this.hideUnusedTableBodyRowElts();
       this.populateVisibleNodes();
@@ -349,7 +353,7 @@ export abstract class AbstractTable<T> {
   }
 
   private createTableBodyRowElts(): HTMLElement[] {
-    return [...Array(this.options.visibleNodes).keys()].map((_, i) => this.createTableBodyRowElt({ nodeIndex: i }));
+    return [...Array(this.virtualNodesCount).keys()].map((_, i) => this.createTableBodyRowElt({ nodeIndex: i }));
   }
 
   private createTableBodyTickElt(): HTMLElement {
@@ -360,12 +364,20 @@ export abstract class AbstractTable<T> {
     return elt;
   }
 
+  private createTableBodyWrapperElt(): HTMLElement {
+    const elt = DomUtils.createElt('div');
+
+    elt.appendChild(this.tableBodyElt);
+
+    return elt;
+  }
+
   private createTableElt(): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CLS, ...(this.options.classList ?? []));
     elt.addEventListener('scroll', () => requestAnimationFrame(() => this.updateVisibleNodes()));
 
     elt.appendChild(this.tableHeaderElt);
-    elt.appendChild(this.tableBodyElt);
+    elt.appendChild(this.tableBodyWrapperElt);
     elt.appendChild(this.virtualScrollSpacerElt);
 
     return elt;
@@ -809,7 +821,11 @@ export abstract class AbstractTable<T> {
   }
 
   private setVirtualScrollSpacerHeight(): void {
-    const height = this.activeNodeIndexes.length * this.options.nodeHeight + this.tableHeaderHeight;
+    const height = this.activeNodeIndexes.length * this.options.nodeHeight;
     this.virtualScrollSpacerElt.style.height = DomUtils.withPx(height);
+
+    //
+    const height2 = Math.min(this.activeNodeIndexes.length, this.options.visibleNodes) * this.options.nodeHeight;
+    this.tableBodyWrapperElt.style.height = DomUtils.withPx(height2);
   }
 }
