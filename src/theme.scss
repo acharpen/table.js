@@ -140,6 +140,13 @@ $table-header-height: 40px;
   background-color: var(--oo-table-color-border-secondary);
 }
 
+.oo-table-cell-content,
+.oo-table-header-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .oo-table-cell-tick i,
 .oo-table-cell-tick i::before {
   border-radius: 50%;
@@ -184,9 +191,6 @@ $table-header-height: 40px;
 .oo-table-cell-content {
   flex-grow: 1;
   line-height: inherit;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .oo-table-cell-tick {

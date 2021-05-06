@@ -125,7 +125,7 @@ export abstract class AbstractTable<T> {
 
     this.tableBodyRowElts.forEach((elt) => (elt.style.height = DomUtils.withPx(this.options.nodeHeight)));
 
-    this.setVirtualScrollSpacerHeight();
+    this.updateTableElements();
   }
 
   // ////////////////////////////////////////////////////////////////////////////
@@ -280,7 +280,7 @@ export abstract class AbstractTable<T> {
 
   private createSortHandleElt(sortOrder: 'asc' | 'desc', ctx: { columnIndex: number }): HTMLElement {
     const elt = DomUtils.createElt(
-      'div',
+      'span',
       sortOrder === 'asc' ? TableUtils.SORT_ASC_HANDLE_CLS : TableUtils.SORT_DESC_HANDLE_CLS
     );
     elt.addEventListener('mouseup', (event) => {
@@ -294,7 +294,7 @@ export abstract class AbstractTable<T> {
   }
 
   private createSortHandlesElt(ctx: { columnIndex: number }): HTMLElement {
-    const elt = DomUtils.createElt('div', TableUtils.SORT_HANDLE_CLS);
+    const elt = DomUtils.createElt('span', TableUtils.SORT_HANDLE_CLS);
 
     elt.appendChild(this.createSortHandleElt('asc', ctx));
     elt.appendChild(this.createSortHandleElt('desc', ctx));
@@ -397,7 +397,8 @@ export abstract class AbstractTable<T> {
 
   private createTableHeaderCellContentElt(column: Column<T>, ctx: { columnIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CONTENT_CLS, TableUtils.getTextAlignCls(column.align));
-    elt.textContent = column.title ?? '';
+
+    elt.appendChild(this.createTableHeaderTitleElt(column));
 
     if (column.sorter) elt.appendChild(this.createSortHandlesElt(ctx));
 
@@ -436,6 +437,13 @@ export abstract class AbstractTable<T> {
     elt.addEventListener('mouseup', () => this.onClickTableHeaderTick());
 
     elt.appendChild(DomUtils.createElt('i'));
+
+    return elt;
+  }
+
+  private createTableHeaderTitleElt(column: Column<T>): HTMLElement {
+    const elt = DomUtils.createElt('span', TableUtils.TABLE_HEADER_TITLE_CLS);
+    elt.textContent = column.title ?? '';
 
     return elt;
   }
@@ -725,7 +733,7 @@ export abstract class AbstractTable<T> {
       if (node.isMatching && !node.isHidden) this.activeNodeIndexes.push(i);
     });
 
-    this.setVirtualScrollSpacerHeight();
+    this.updateTableElements();
   }
 
   private resetColumnSortHandles(): void {
@@ -820,12 +828,14 @@ export abstract class AbstractTable<T> {
     }
   }
 
-  private setVirtualScrollSpacerHeight(): void {
-    const height = this.activeNodeIndexes.length * this.options.nodeHeight;
-    this.virtualScrollSpacerElt.style.height = DomUtils.withPx(height);
+  private updateTableElements(): void {
+    // Table body wrapper
+    const tableBodyWrapperheight =
+      Math.min(this.activeNodeIndexes.length, this.options.visibleNodes) * this.options.nodeHeight;
+    this.tableBodyWrapperElt.style.height = DomUtils.withPx(tableBodyWrapperheight);
 
-    //
-    const height2 = Math.min(this.activeNodeIndexes.length, this.options.visibleNodes) * this.options.nodeHeight;
-    this.tableBodyWrapperElt.style.height = DomUtils.withPx(height2);
+    // Virtual scroll spacer
+    const virtualScrollSpacerHeight = this.activeNodeIndexes.length * this.options.nodeHeight;
+    this.virtualScrollSpacerElt.style.height = DomUtils.withPx(virtualScrollSpacerHeight);
   }
 }

@@ -24,6 +24,7 @@ export class TableUtils {
   public static readonly TABLE_CELL_TICK_CLS: string = `${TableUtils.VENDOR_CLS}-cell-tick`;
   public static readonly TABLE_CLS: string = TableUtils.VENDOR_CLS;
   public static readonly TABLE_HEADER_CLS: string = `${TableUtils.VENDOR_CLS}-header`;
+  public static readonly TABLE_HEADER_TITLE_CLS: string = `${TableUtils.VENDOR_CLS}-header-title`;
   public static readonly TABLE_ROW_ACTIONS_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-row-actions-handle`;
   public static readonly TABLE_ROW_CLS: string = `${TableUtils.VENDOR_CLS}-row`;
   public static readonly VIRTUAL_SCROLL_SPACER_CLS: string = `${TableUtils.VENDOR_CLS}-virtual-scroll-spacer`;
