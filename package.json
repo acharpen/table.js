@@ -1,6 +1,6 @@
 {
   "name": "@oorg/table.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "LGPL-3.0-or-later",
   "description": "Virtual scroll table for JavaScript ecosystem",
   "homepage": "https://github.com/acharpen/table.js",
