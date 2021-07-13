@@ -7,6 +7,8 @@ export interface TableOptions<T> {
   rowActions?: { callback: (item: T) => void; label: string }[][];
   rowClassList?: (item: T, rowIndex: number) => string[];
   selectable?: boolean | number;
+  selectableCheck?: (item: T) => boolean;
+  selectableRollingSelection?: boolean;
 }
 
 export type ListTableOptions<T> = TableOptions<T>;

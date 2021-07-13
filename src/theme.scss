@@ -46,11 +46,11 @@ $table-header-height: 40px;
 }
 
 .oo-table-body .oo-table-cell-content a,
+.oo-table-body .oo-table-cell-tick,
 .oo-table-body .oo-table-row-actions-handle,
-.oo-table-cell-tick i,
 .oo-table-expand-toggler,
 .oo-table-header .oo-table-cell,
-.oo-table-header .oo-table-cell-tick,
+.oo-table-selection-all .oo-table-header .oo-table-cell-tick,
 .oo-table-overlay ul li.oo-table-list-item {
   cursor: pointer;
 }
@@ -105,23 +105,29 @@ $table-header-height: 40px;
   color: var(--oo-table-color-text-primary);
 }
 
-.oo-table-expand-toggler:hover i,
-.oo-table-expand-toggler.oo-table-active i,
-.oo-table-header .oo-table-cell:hover .oo-table-sort-asc-handle:hover i,
-.oo-table-header .oo-table-cell:hover .oo-table-sort-desc-handle:hover i {
-  border-color: var(--oo-table-color-text-primary);
+.oo-table-expand-toggler:hover,
+.oo-table-expand-toggler.oo-table-active,
+.oo-table-header .oo-table-cell:hover .oo-table-sort-asc-handle:hover,
+.oo-table-header .oo-table-cell:hover .oo-table-sort-desc-handle:hover {
+  i {
+    border-color: var(--oo-table-color-text-primary);
+  }
 }
 
-.oo-table-expand-toggler i,
-.oo-table-sort-asc-handle i,
-.oo-table-sort-desc-handle i {
-  @include chevron();
+.oo-table-expand-toggler,
+.oo-table-sort-asc-handle,
+.oo-table-sort-desc-handle {
+  i {
+    @include chevron();
+  }
 }
 
-.oo-table-row.oo-table-selected .oo-table-cell-tick i,
-.oo-table-sort-asc-handle.oo-table-active i,
-.oo-table-sort-desc-handle.oo-table-active i {
-  border-color: var(--oo-table-color-text-primary) !important;
+.oo-table-row.oo-table-selected .oo-table-cell-tick,
+.oo-table-sort-asc-handle.oo-table-active,
+.oo-table-sort-desc-handle.oo-table-active {
+  i {
+    border-color: var(--oo-table-color-text-primary) !important;
+  }
 }
 
 .oo-table,
@@ -147,14 +153,24 @@ $table-header-height: 40px;
   white-space: nowrap;
 }
 
-.oo-table-cell-tick i,
-.oo-table-cell-tick i::before {
-  border-radius: 50%;
-}
-
 .oo-table-cell-tick,
 .oo-table-row-actions-handle {
   width: 32px;
+}
+
+.oo-table-selection-all,
+.oo-table-selection-multiple {
+  .oo-table-cell-tick i {
+    &,
+    &::before {
+      border-radius: 4px;
+    }
+
+    &::before {
+      height: 12px;
+      width: 12px;
+    }
+  }
 }
 
 .oo-table {
@@ -193,17 +209,25 @@ $table-header-height: 40px;
   line-height: inherit;
 }
 
-.oo-table-cell-tick {
-  i {
-    border: 1px solid transparent;
-    height: 16px;
-    width: 16px;
+.oo-table-cell-tick i {
+  border: 1px solid transparent;
+  height: 16px;
+  width: 16px;
 
-    &::before {
-      content: "";
-      height: 8px;
-      width: 8px;
-    }
+  &::before {
+    content: "";
+  }
+}
+
+.oo-table-selection-single .oo-table-cell-tick i {
+  &,
+  &::before {
+    border-radius: 50%;
+  }
+
+  &::before {
+    height: 8px;
+    width: 8px;
   }
 }
 
@@ -295,10 +319,8 @@ $table-header-height: 40px;
   width: $sort-handle-width;
 }
 
-.oo-table-text-right {
-  .oo-table-sort-handle {
-    margin-right: 8px;
-  }
+.oo-table-text-right .oo-table-sort-handle {
+  margin-right: 8px;
 }
 
 /* Body ******************************************************************** */
@@ -310,14 +332,16 @@ $table-header-height: 40px;
     background-color: var(--oo-table-color-bg-primary); // mandatory
   }
 
-  .oo-table-cell-content {
-    a {
-      color: var(--oo-table-color-text-link);
+  .oo-table-cell-content a {
+    color: var(--oo-table-color-text-link);
 
-      &:hover {
-        text-decoration: underline;
-      }
+    &:hover {
+      text-decoration: underline;
     }
+  }
+
+  .oo-table-row.oo-table-unselectable .oo-table-cell-tick i {
+    cursor: not-allowed;
   }
 
   .oo-table-sticky-leftmost {

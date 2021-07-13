@@ -31,6 +31,7 @@ export abstract class AbstractTable<T> {
   private currRangeStart: number | null;
   private currSort: { column: Column<T>; sorter: (a: T, b: T) => number; sortOrder: SortOrder } | null;
   private prevRangeStart: number | null;
+  private selectedNodeIds: number[];
 
   protected constructor(
     containerElt: HTMLElement,
@@ -46,6 +47,7 @@ export abstract class AbstractTable<T> {
     this.nodes = [];
     this.options = tableOptions;
     this.prevRangeStart = null;
+    this.selectedNodeIds = [];
     this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING;
     this.visibleNodeIndexes = [];
 
@@ -71,10 +73,14 @@ export abstract class AbstractTable<T> {
 
   public deselectNodes(nodeIds: number[]): void {
     if (this.isSelectionEnabled()) {
-      (nodeIds.length > 0 ? this.getNodesById(nodeIds) : this.nodes).forEach((node) => (node.isSelected = false));
+      if (nodeIds.length > 0) this.deselectNodesById(nodeIds);
+      else {
+        this.nodes.forEach((node) => (node.isSelected = false));
+        this.selectedNodeIds = [];
+      }
 
       // Update nodes selection indicator in table header
-      if (this.nodes.every((node) => !node.isSelected)) {
+      if (this.selectedNodeIds.length === 0) {
         this.tableHeaderRowElt.classList.remove(TableUtils.SELECTED_CLS);
       }
 
@@ -90,24 +96,91 @@ export abstract class AbstractTable<T> {
 
   public selectNodes(nodeIds: number[]): void {
     if (this.isSelectionEnabled()) {
+      const get = (): Node<T>[] => {
+        const nodes = this.getNodesById(nodeIds);
+
+        return this.options.selectableCheck
+          ? nodes.filter((node) => (this.options.selectableCheck as (item: T) => boolean)(node.value))
+          : nodes;
+      };
+      const select = (node: Node<T>): void => {
+        node.isSelected = true;
+        this.selectedNodeIds.push(node.id);
+      };
+
       if (this.options.selectable === true) {
-        (nodeIds.length > 0 ? this.getNodesById(nodeIds) : this.nodes).forEach((node) => (node.isSelected = true));
+        (nodeIds.length > 0 ? get() : this.nodes).forEach(select);
       } else {
-        const selectableNodesCount =
-          (this.options.selectable as number) - this.nodes.filter((node) => node.isSelected).length;
+        // I: the number of input nodes that can be selected according to 'selectableCheck' predicate
+        // N: the number of selectable nodes as defined in table options
+        // S: the number of selected nodes
+        // M: the number of nodes that can be selected; M = N - S
+
+        const selectable = this.options.selectable as number;
 
         if (nodeIds.length > 0) {
-          this.getNodesById(nodeIds.slice(0, selectableNodesCount)).forEach((node) => (node.isSelected = true));
+          const nodes = get();
+          const nodesCount = nodes.length;
+
+          if (this.options.selectableRollingSelection ?? false) {
+            // A: the number of nodes to select; A <= N
+            // Deselect the first (A - M) nodes and select A input nodes
+            const selectingNodes = nodes.slice(Math.max(0, nodesCount - selectable));
+            const deselectingNodesCount = Math.max(
+              0,
+              selectingNodes.length - (selectable - this.selectedNodeIds.length)
+            );
+
+            this.deselectNodesById(this.selectedNodeIds.slice(0, deselectingNodesCount));
+
+            selectingNodes.forEach(select);
+          } else {
+            // B: the number of nodes to select; B = min(I, M)
+            // Select the first B input nodes
+            nodes.slice(0, Math.min(nodesCount, selectable - this.selectedNodeIds.length)).forEach(select);
+          }
         } else {
-          this.nodes.slice(0, selectableNodesCount).forEach((node) => (node.isSelected = true));
+          if (this.options.selectableRollingSelection ?? false) {
+            // Deselect all and select the last N nodes
+            this.deselectNodesById(this.selectedNodeIds);
+
+            let i = this.nodes.length - 1;
+            let remainingNodesCount = selectable;
+            do {
+              const node = this.nodes[i];
+              if (!this.options.selectableCheck || this.options.selectableCheck(node.value)) {
+                select(node);
+                remainingNodesCount--;
+              }
+
+              i--;
+            } while (remainingNodesCount > 0 && i >= 0);
+          } else {
+            // Select the first M nodes
+            const allNodesCount = this.nodes.length;
+            let i = 0;
+            let remainingNodesCount = selectable - this.selectedNodeIds.length;
+            while (remainingNodesCount > 0 && i < allNodesCount) {
+              const node = this.nodes[i];
+              if (!this.options.selectableCheck || this.options.selectableCheck(node.value)) {
+                select(node);
+                remainingNodesCount--;
+              }
+
+              i++;
+            }
+          }
         }
       }
+
+      // Remove duplicates
+      this.selectedNodeIds = [...new Set<number>(this.selectedNodeIds)];
+
+      // Update nodes selection indicator in table header
+      this.tableHeaderRowElt.classList.add(TableUtils.SELECTED_CLS);
+
+      this.updateVisibleNodes(true);
     }
-
-    // Update nodes selection indicator in table header
-    this.tableHeaderRowElt.classList.add(TableUtils.SELECTED_CLS);
-
-    this.updateVisibleNodes(true);
   }
 
   public sort(columnId: number, sortOrder: SortOrder): void {
@@ -231,7 +304,7 @@ export abstract class AbstractTable<T> {
 
   private computeTickCellWidth(): number {
     let tickCellWidth = 0;
-    if (this.options.selectable != null) {
+    if (this.isSelectionEnabled()) {
       const tickCellElt = this.tableHeaderRowElt.firstElementChild as HTMLElement;
       if (tickCellElt.classList.contains(TableUtils.STICKY_CLS)) tickCellWidth = DomUtils.getComputedWidth(tickCellElt);
     }
@@ -375,6 +448,11 @@ export abstract class AbstractTable<T> {
   private createTableElt(): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CLS, ...(this.options.classList ?? []));
     elt.addEventListener('scroll', () => requestAnimationFrame(() => this.updateVisibleNodes()));
+    if (this.isSelectionEnabled()) {
+      if (this.options.selectable === true) elt.classList.add(TableUtils.SELECTION_ALL_CLS);
+      else if (this.options.selectable === 1) elt.classList.add(TableUtils.SELECTION_SINGLE_CLS);
+      else elt.classList.add(TableUtils.SELECTION_MULTIPLE_CLS);
+    }
 
     elt.appendChild(this.tableHeaderElt);
     elt.appendChild(this.tableBodyWrapperElt);
@@ -434,9 +512,11 @@ export abstract class AbstractTable<T> {
 
   private createTableHeaderTickElt(): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_TICK_CLS);
-    elt.addEventListener('mouseup', () => this.onClickTableHeaderTick());
+    if (this.options.selectable === true) {
+      elt.addEventListener('mouseup', () => this.onClickTableHeaderTick());
 
-    elt.appendChild(DomUtils.createElt('i'));
+      elt.appendChild(DomUtils.createElt('i'));
+    }
 
     return elt;
   }
@@ -452,6 +532,13 @@ export abstract class AbstractTable<T> {
     return DomUtils.createElt('div', TableUtils.VIRTUAL_SCROLL_SPACER_CLS);
   }
 
+  private deselectNodesById(nodeIds: number[]): void {
+    this.getNodesById(nodeIds).forEach((node) => (node.isSelected = false));
+
+    const nodeIdSet = new Set<number>(nodeIds);
+    this.selectedNodeIds = this.selectedNodeIds.filter((nodeId) => !nodeIdSet.has(nodeId));
+  }
+
   private getColumnSortHandles(headerCellElt: HTMLElement): { sortAscElt: HTMLElement; sortDescElt: HTMLElement } {
     const sortHandlesElt = headerCellElt.getElementsByClassName(TableUtils.SORT_HANDLE_CLS).item(0) as HTMLElement;
 
@@ -462,7 +549,25 @@ export abstract class AbstractTable<T> {
   }
 
   private getNodesById(ids: number[]): Node<T>[] {
-    return ids.map((id) => this.nodes.find((node) => node.id === id)).filter((node) => node) as Node<T>[];
+    const idsCount = ids.length;
+    const nodes = [];
+    const nodesCount = this.nodes.length;
+
+    for (let i = 0; i < nodesCount; i++) {
+      const node = this.nodes[i];
+      let j = 0;
+
+      while (j < idsCount) {
+        if (ids[j] === node.id) {
+          nodes.push(node);
+          break;
+        }
+
+        j++;
+      }
+    }
+
+    return nodes;
   }
 
   private handleFilter(): void {
@@ -628,7 +733,7 @@ export abstract class AbstractTable<T> {
   }
 
   private onClickTableHeaderTick(): void {
-    if (this.nodes.every((node) => node.isSelected)) this.deselectNodes([]);
+    if (this.selectedNodeIds.length === this.nodes.length) this.deselectNodes([]);
     else this.selectNodes([]);
   }
 
@@ -711,8 +816,9 @@ export abstract class AbstractTable<T> {
       }
 
       // Update selection
+      nodeElt.classList.remove(TableUtils.SELECTED_CLS, TableUtils.UNSELECTABLE_CLS);
       if (node.isSelected) nodeElt.classList.add(TableUtils.SELECTED_CLS);
-      else nodeElt.classList.remove(TableUtils.SELECTED_CLS);
+      if (this.options.selectableCheck?.(node.value) === false) nodeElt.classList.add(TableUtils.UNSELECTABLE_CLS);
     }
   }
 
