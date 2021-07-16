@@ -66,137 +66,150 @@ export abstract class AbstractTable<T> {
   // ////////////////////////////////////////////////////////////////////////////
 
   public deleteNodes(nodeIds: number[]): void {
-    this.nodes = this.nodes.filter((node) => !nodeIds.includes(node.id));
+    this.runBlockingAction(() => {
+      this.nodes = this.nodes.filter((node) => !nodeIds.includes(node.id));
 
-    this.updateNodes();
+      this.updateNodes();
+    });
   }
 
   public deselectNodes(nodeIds: number[]): void {
-    if (this.isSelectionEnabled()) {
-      if (nodeIds.length > 0) this.deselectNodesById(nodeIds);
-      else {
-        this.nodes.forEach((node) => (node.isSelected = false));
-        this.selectedNodeIds = [];
-      }
+    this.runBlockingAction(() => {
+      if (this.isSelectionEnabled()) {
+        if (nodeIds.length > 0) this.deselectNodesById(nodeIds);
+        else {
+          this.nodes.forEach((node) => (node.isSelected = false));
+          this.selectedNodeIds = [];
+        }
 
-      // Update nodes selection indicator in table header
-      if (this.selectedNodeIds.length === 0) {
-        this.tableHeaderRowElt.classList.remove(TableUtils.SELECTED_CLS);
-      }
+        // Update nodes selection indicator in table header
+        if (this.selectedNodeIds.length === 0) {
+          this.tableHeaderRowElt.classList.remove(TableUtils.SELECTED_CLS);
+        }
 
-      this.updateVisibleNodes(true);
-    }
+        this.updateVisibleNodes(true);
+      }
+    });
   }
 
   public filter(matcher: (value: T) => boolean): void {
-    this.currFilter = { matcher };
+    this.runBlockingAction(() => {
+      this.currFilter = { matcher };
 
-    this.updateNodes({ performFiltering: true });
+      this.updateNodes({ performFiltering: true });
+    });
   }
 
   public selectNodes(nodeIds: number[]): void {
-    if (this.isSelectionEnabled()) {
-      const get = (): Node<T>[] => {
-        const nodes = this.getNodesById(nodeIds);
+    this.runBlockingAction(() => {
+      if (this.isSelectionEnabled()) {
+        const get = (): Node<T>[] => {
+          const nodes = this.getNodesById(nodeIds);
 
-        return this.options.selectableCheck
-          ? nodes.filter((node) => (this.options.selectableCheck as (item: T) => boolean)(node.value))
-          : nodes;
-      };
-      const select = (node: Node<T>): void => {
-        node.isSelected = true;
-        this.selectedNodeIds.push(node.id);
-      };
+          return this.options.selectableCheck
+            ? nodes.filter((node) => (this.options.selectableCheck as (item: T) => boolean)(node.value))
+            : nodes;
+        };
+        const select = (node: Node<T>): void => {
+          node.isSelected = true;
+          this.selectedNodeIds.push(node.id);
+        };
 
-      if (this.options.selectable === true) {
-        (nodeIds.length > 0 ? get() : this.nodes).forEach(select);
-      } else {
-        // I: the number of input nodes that can be selected according to 'selectableCheck' predicate
-        // N: the number of selectable nodes as defined in table options
-        // S: the number of selected nodes
-        // M: the number of nodes that can be selected; M = N - S
-
-        const selectable = this.options.selectable as number;
-
-        if (nodeIds.length > 0) {
-          const nodes = get();
-          const nodesCount = nodes.length;
-
-          if (this.options.selectableRollingSelection ?? false) {
-            // A: the number of nodes to select; A <= N
-            // Deselect the first (A - M) nodes and select A input nodes
-            const selectingNodes = nodes.slice(Math.max(0, nodesCount - selectable));
-            const deselectingNodesCount = Math.max(
-              0,
-              selectingNodes.length - (selectable - this.selectedNodeIds.length)
-            );
-
-            this.deselectNodesById(this.selectedNodeIds.slice(0, deselectingNodesCount));
-
-            selectingNodes.forEach(select);
-          } else {
-            // B: the number of nodes to select; B = min(I, M)
-            // Select the first B input nodes
-            nodes.slice(0, Math.min(nodesCount, selectable - this.selectedNodeIds.length)).forEach(select);
-          }
+        if (this.options.selectable === true) {
+          (nodeIds.length > 0 ? get() : this.nodes).forEach(select);
         } else {
-          if (this.options.selectableRollingSelection ?? false) {
-            // Deselect all and select the last N nodes
-            this.deselectNodesById(this.selectedNodeIds);
+          // I: the number of input nodes that can be selected according to 'selectableCheck' predicate
+          // N: the number of selectable nodes as defined in table options
+          // S: the number of selected nodes
+          // M: the number of nodes that can be selected; M = N - S
 
-            let i = this.nodes.length - 1;
-            let remainingNodesCount = selectable;
-            do {
-              const node = this.nodes[i];
-              if (!this.options.selectableCheck || this.options.selectableCheck(node.value)) {
-                select(node);
-                remainingNodesCount--;
-              }
+          const selectable = this.options.selectable as number;
 
-              i--;
-            } while (remainingNodesCount > 0 && i >= 0);
+          if (nodeIds.length > 0) {
+            const nodes = get();
+            const nodesCount = nodes.length;
+
+            if (this.options.selectableRollingSelection ?? false) {
+              // A: the number of nodes to select; A <= N
+              // Deselect the first (A - M) nodes and select A input nodes
+              const selectingNodes = nodes.slice(Math.max(0, nodesCount - selectable));
+              const deselectingNodesCount = Math.max(
+                0,
+                selectingNodes.length - (selectable - this.selectedNodeIds.length)
+              );
+
+              this.deselectNodesById(this.selectedNodeIds.slice(0, deselectingNodesCount));
+
+              selectingNodes.forEach(select);
+            } else {
+              // B: the number of nodes to select; B = min(I, M)
+              // Select the first B input nodes
+              nodes.slice(0, Math.min(nodesCount, selectable - this.selectedNodeIds.length)).forEach(select);
+            }
           } else {
-            // Select the first M nodes
-            const allNodesCount = this.nodes.length;
-            let i = 0;
-            let remainingNodesCount = selectable - this.selectedNodeIds.length;
-            while (remainingNodesCount > 0 && i < allNodesCount) {
-              const node = this.nodes[i];
-              if (!this.options.selectableCheck || this.options.selectableCheck(node.value)) {
-                select(node);
-                remainingNodesCount--;
-              }
+            if (this.options.selectableRollingSelection ?? false) {
+              // Deselect all and select the last N nodes
+              this.deselectNodesById(this.selectedNodeIds);
 
-              i++;
+              let i = this.nodes.length - 1;
+              let remainingNodesCount = selectable;
+              do {
+                const node = this.nodes[i];
+                if (!this.options.selectableCheck || this.options.selectableCheck(node.value)) {
+                  select(node);
+                  remainingNodesCount--;
+                }
+
+                i--;
+              } while (remainingNodesCount > 0 && i >= 0);
+            } else {
+              // Select the first M nodes
+              const allNodesCount = this.nodes.length;
+              let i = 0;
+              let remainingNodesCount = selectable - this.selectedNodeIds.length;
+              while (remainingNodesCount > 0 && i < allNodesCount) {
+                const node = this.nodes[i];
+                if (!this.options.selectableCheck || this.options.selectableCheck(node.value)) {
+                  select(node);
+                  remainingNodesCount--;
+                }
+
+                i++;
+              }
             }
           }
         }
+
+        // Remove duplicates
+        this.selectedNodeIds = [...new Set<number>(this.selectedNodeIds)];
+
+        // Update nodes selection indicator in table header
+        this.tableHeaderRowElt.classList.add(TableUtils.SELECTED_CLS);
+
+        this.updateVisibleNodes(true);
       }
-
-      // Remove duplicates
-      this.selectedNodeIds = [...new Set<number>(this.selectedNodeIds)];
-
-      // Update nodes selection indicator in table header
-      this.tableHeaderRowElt.classList.add(TableUtils.SELECTED_CLS);
-
-      this.updateVisibleNodes(true);
-    }
+    });
   }
 
   public sort(columnId: number, sortOrder: SortOrder): void {
-    const targetColumn = this.dataColumns.find((column) => column.id === columnId);
+    this.runBlockingAction(() => {
+      const targetColumn = this.dataColumns.find((column) => column.id === columnId);
 
-    if (targetColumn?.sorter != null) {
-      this.currSort = sortOrder === 'default' ? null : { sortOrder, column: targetColumn, sorter: targetColumn.sorter };
+      if (targetColumn?.sorter != null) {
+        this.currSort =
+          sortOrder === 'default' ? null : { sortOrder, column: targetColumn, sorter: targetColumn.sorter };
 
-      this.updateNodes({ performSorting: true });
-    }
+        this.updateNodes({ performSorting: true });
+      }
+    });
   }
 
   public updateNodeHeight(nodeHeight: number): void {
+    const nodeHeightPx = DomUtils.withPx(this.options.nodeHeight);
+
     this.options.nodeHeight = nodeHeight;
 
-    this.tableBodyRowElts.forEach((elt) => (elt.style.height = DomUtils.withPx(this.options.nodeHeight)));
+    this.tableBodyRowElts.forEach((elt) => (elt.style.height = nodeHeightPx));
 
     this.updateTableElements();
   }
@@ -253,6 +266,25 @@ export abstract class AbstractTable<T> {
     this.containerElt.appendChild(this.tableElt);
 
     this.setStickyColumnsPosition();
+  }
+
+  protected runBlockingAction(callback: () => void): void {
+    const spinnerElt = DomUtils.createElt('div', TableUtils.SPINNER_CLS);
+    spinnerElt.appendChild(DomUtils.createElt('div', TableUtils.SPINNER_BOUNCE1_CLS));
+    spinnerElt.appendChild(DomUtils.createElt('div', TableUtils.SPINNER_BOUNCE2_CLS));
+    spinnerElt.appendChild(DomUtils.createElt('div'));
+
+    const overlayElt = DomUtils.createElt('div', TableUtils.BLOCKING_CLS);
+    overlayElt.style.height = DomUtils.withPx(DomUtils.getComputedHeight(this.tableElt));
+    overlayElt.style.width = DomUtils.withPx(DomUtils.getComputedWidth(this.tableElt));
+    overlayElt.appendChild(spinnerElt);
+
+    // 1. Show overlay
+    this.containerElt.appendChild(overlayElt);
+    // 2. Run
+    callback();
+    // 3. Hide overlay
+    this.containerElt.removeChild(overlayElt);
   }
 
   protected setNodes(nodes: Node<T>[]): void {

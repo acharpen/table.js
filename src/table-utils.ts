@@ -6,6 +6,7 @@ export class TableUtils {
   public static readonly VENDOR_CLS: string = 'oo-table';
 
   public static readonly ACTIVE_CLS: string = `${TableUtils.VENDOR_CLS}-active`;
+  public static readonly BLOCKING_CLS: string = `${TableUtils.VENDOR_CLS}-blocking`;
   public static readonly EXPAND_TOGGLER_CLS: string = `${TableUtils.VENDOR_CLS}-expand-toggler`;
   public static readonly HIDDEN_CLS: string = `${TableUtils.VENDOR_CLS}-hidden`;
   public static readonly LIST_DIVIDER_CLS: string = `${TableUtils.VENDOR_CLS}-list-divider`;
@@ -19,6 +20,9 @@ export class TableUtils {
   public static readonly SORT_ASC_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-sort-asc-handle`;
   public static readonly SORT_DESC_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-sort-desc-handle`;
   public static readonly SORT_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-sort-handle`;
+  public static readonly SPINNER_BOUNCE1_CLS: string = `${TableUtils.VENDOR_CLS}-spinner-bounce1`;
+  public static readonly SPINNER_BOUNCE2_CLS: string = `${TableUtils.VENDOR_CLS}-spinner-bounce2`;
+  public static readonly SPINNER_CLS: string = `${TableUtils.VENDOR_CLS}-spinner`;
   public static readonly STICKY_CLS: string = `${TableUtils.VENDOR_CLS}-sticky`;
   public static readonly STICKY_LEFTMOST_CLS: string = `${TableUtils.VENDOR_CLS}-sticky-leftmost`;
   public static readonly STICKY_RIGHTMOST_CLS: string = `${TableUtils.VENDOR_CLS}-sticky-rightmost`;

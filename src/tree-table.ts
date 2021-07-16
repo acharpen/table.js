@@ -27,51 +27,56 @@ export class TreeTable<T> extends AbstractTable<T> {
     item: TreeNode<T>,
     options: { position: 'top' | 'bottom'; refNodeId?: number } | { position: 'child' | 'parent'; refNodeId: number }
   ): void {
-    const isAbove = options.position === 'top' || options.position === 'parent';
-    const refNodeIndex = options.refNodeId != null ? this.nodes.findIndex((node) => node.id === options.refNodeId) : -1;
-    const newNodeIndex =
-      refNodeIndex !== -1 ? (isAbove ? refNodeIndex : refNodeIndex + 1) : isAbove ? 0 : this.nodes.length;
-    const refNode = isAbove ? this.nodes[newNodeIndex] : this.nodes[newNodeIndex - 1];
-    const newNodes = this.createNodes([item]);
-    const newRootNode = newNodes[0];
+    this.runBlockingAction(() => {
+      const isAbove = options.position === 'top' || options.position === 'parent';
+      const refNodeIndex =
+        options.refNodeId != null ? this.nodes.findIndex((node) => node.id === options.refNodeId) : -1;
+      const newNodeIndex =
+        refNodeIndex !== -1 ? (isAbove ? refNodeIndex : refNodeIndex + 1) : isAbove ? 0 : this.nodes.length;
+      const refNode = isAbove ? this.nodes[newNodeIndex] : this.nodes[newNodeIndex - 1];
+      const newNodes = this.createNodes([item]);
+      const newRootNode = newNodes[0];
 
-    // Insert new node
-    this.nodes.splice(newNodeIndex, 0, newRootNode);
+      // Insert new node
+      this.nodes.splice(newNodeIndex, 0, newRootNode);
 
-    // Set new node's level
-    newRootNode.level =
-      options.position === 'top' || options.position === 'bottom' || options.position === 'parent'
-        ? refNode.level
-        : refNode.level + 1;
+      // Set new node's level
+      newRootNode.level =
+        options.position === 'top' || options.position === 'bottom' || options.position === 'parent'
+          ? refNode.level
+          : refNode.level + 1;
 
-    // Set new node's visibility
-    newRootNode.isHidden =
-      options.position === 'top' || options.position === 'bottom' || options.position === 'parent'
-        ? refNode.isHidden
-        : !refNode.isExpanded;
+      // Set new node's visibility
+      newRootNode.isHidden =
+        options.position === 'top' || options.position === 'bottom' || options.position === 'parent'
+          ? refNode.isHidden
+          : !refNode.isExpanded;
 
-    // Update new node's children
-    if (options.position === 'parent') {
-      const nodesLength = this.nodes.length;
-      let nextnodeIndex = refNodeIndex;
+      // Update new node's children
+      if (options.position === 'parent') {
+        const nodesLength = this.nodes.length;
+        let nextnodeIndex = refNodeIndex;
 
-      do {
-        this.nodes[nextnodeIndex].level++;
+        do {
+          this.nodes[nextnodeIndex].level++;
 
-        nextnodeIndex++;
-      } while (nextnodeIndex < nodesLength && this.nodes[nextnodeIndex].level > newRootNode.level);
-    }
+          nextnodeIndex++;
+        } while (nextnodeIndex < nodesLength && this.nodes[nextnodeIndex].level > newRootNode.level);
+      }
 
-    // Update initial position of next nodes
-    this.nodes
-      .slice(newNodeIndex + newNodes.length + 1)
-      .forEach((node) => (node.initialPos = node.initialPos + newNodes.length));
+      // Update initial position of next nodes
+      this.nodes
+        .slice(newNodeIndex + newNodes.length + 1)
+        .forEach((node) => (node.initialPos = node.initialPos + newNodes.length));
 
-    this.updateNodes();
+      this.updateNodes();
+    });
   }
 
   public collapseNodes(nodeIds: number[]): void {
-    this.toggleNodesVisibility(nodeIds, { isExpanded: false });
+    this.runBlockingAction(() => {
+      this.toggleNodesVisibility(nodeIds, { isExpanded: false });
+    });
   }
 
   public deselectNodes(
@@ -89,7 +94,9 @@ export class TreeTable<T> extends AbstractTable<T> {
   }
 
   public expandNodes(nodeIds: number[]): void {
-    this.toggleNodesVisibility(nodeIds, { isExpanded: true });
+    this.runBlockingAction(() => {
+      this.toggleNodesVisibility(nodeIds, { isExpanded: true });
+    });
   }
 
   public getNodes(): TreeNodeView<T>[] {
@@ -111,7 +118,9 @@ export class TreeTable<T> extends AbstractTable<T> {
   }
 
   public setData(items: TreeNode<T>[]): void {
-    this.setNodes(this.createNodes(items));
+    this.runBlockingAction(() => {
+      this.setNodes(this.createNodes(items));
+    });
   }
 
   protected createTableBodyCellElt(column: Column<T>, ctx: { nodeIndex: number }): HTMLElement {
