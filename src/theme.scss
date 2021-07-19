@@ -20,16 +20,6 @@ $table-header-height: 40px;
   --oo-table-color-text-primary: #4b5563;
 }
 
-/* Mixins ****************************************************************** */
-
-@mixin chevron() {
-  border-style: solid;
-  border-width: 0 2px 2px 0;
-  padding: 3px;
-
-  transition: border-color 0.25s ease-in;
-}
-
 /* Common ****************************************************************** */
 
 * {
@@ -65,6 +55,7 @@ $table-header-height: 40px;
 .oo-table-resize-handle {
   align-items: center;
   display: flex;
+  flex-direction: row;
 }
 
 .oo-table,
@@ -123,7 +114,10 @@ $table-header-height: 40px;
 .oo-table-sort-btn-asc,
 .oo-table-sort-btn-desc {
   i {
-    @include chevron();
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+
+    transition: border-color 0.25s ease-in;
   }
 }
 
@@ -248,10 +242,12 @@ $table-header-height: 40px;
 .oo-table-sort-btn-asc,
 .oo-table-sort-btn-desc {
   display: flex;
+  flex-direction: row;
   position: absolute;
 
   i {
     border-color: transparent;
+    padding: 2px;
   }
 }
 
@@ -272,6 +268,7 @@ $table-header-height: 40px;
 
   .oo-table-cell-content {
     display: flex;
+    flex-direction: row;
   }
 
   .oo-table-row {
@@ -311,7 +308,7 @@ $table-header-height: 40px;
 }
 
 .oo-table-sort-btn-asc {
-  margin-bottom: 8px;
+  top: 4px;
 
   i {
     transform: rotate(-135deg);
@@ -319,7 +316,7 @@ $table-header-height: 40px;
 }
 
 .oo-table-sort-btn-desc {
-  margin-top: 8px;
+  bottom: 4px;
 
   i {
     transform: rotate(45deg);
@@ -328,6 +325,8 @@ $table-header-height: 40px;
 
 .oo-table-sort-btns {
   display: flex;
+  flex-direction: row;
+  position: relative;
   width: $sort-button-width;
 }
 
@@ -393,6 +392,7 @@ $table-header-height: 40px;
   }
 
   i {
+    padding: 3px;
     transform: rotate(-45deg);
   }
 }

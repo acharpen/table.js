@@ -373,7 +373,7 @@ export abstract class AbstractTable<T> {
     }
   }
 
-  private createOverlayElt(onClose?: () => void): HTMLElement {
+  private createOverlayElt({ onClose }: { onClose?: () => void } = {}): HTMLElement {
     const overlayElt = DomUtils.createElt('div', TableUtils.OVERLAY_CLS);
 
     const listener = (event: Event): void => {
@@ -407,7 +407,7 @@ export abstract class AbstractTable<T> {
 
   private createSortButtonElt(sortOrder: 'asc' | 'desc', ctx: { columnIndex: number }): HTMLElement {
     const elt = DomUtils.createElt(
-      'span',
+      'div',
       sortOrder === 'asc' ? TableUtils.SORT_BUTTON_ASC_CLS : TableUtils.SORT_BUTTON_DESC_CLS
     );
 
@@ -422,7 +422,7 @@ export abstract class AbstractTable<T> {
   }
 
   private createSortButtonsElt(ctx: { columnIndex: number }): HTMLElement {
-    const elt = DomUtils.createElt('span', TableUtils.SORT_BUTTONS_CLS);
+    const elt = DomUtils.createElt('div', TableUtils.SORT_BUTTONS_CLS);
 
     elt.appendChild(this.createSortButtonElt('asc', ctx));
     elt.appendChild(this.createSortButtonElt('desc', ctx));
@@ -774,12 +774,14 @@ export abstract class AbstractTable<T> {
 
   private onClickTableBodyRowActionsButton(nodeIndex: number, event: Event): void {
     const eventTarget = event.target as HTMLElement;
-    const rowActionsButtonCellElt = eventTarget.closest(`.${TableUtils.TABLE_ROW_ACTIONS_HANDLE_CLS}`) as HTMLElement;
+    const refButtonElt = eventTarget.closest(`.${TableUtils.TABLE_ROW_ACTIONS_HANDLE_CLS}`) as HTMLElement;
 
     if (this.options.rowActions && this.options.rowActions.length > 0) {
       const listElt = DomUtils.createElt('ul');
       const node = this.getNodeByIndex(nodeIndex);
-      const overlayElt = this.createOverlayElt(() => rowActionsButtonCellElt.classList.remove(TableUtils.ACTIVE_CLS));
+      const overlayElt = this.createOverlayElt({
+        onClose: () => refButtonElt.classList.remove(TableUtils.ACTIVE_CLS)
+      });
 
       const createRowActionsGroup = (rowActions: { callback: (item: T) => void; label: string }[]): void => {
         for (let i = 0, len = rowActions.length; i < len; i++) {
@@ -802,9 +804,9 @@ export abstract class AbstractTable<T> {
       }
       overlayElt.appendChild(listElt);
 
-      // Set overlay size
+      // Set overlay position and size
       const { height, width } = DomUtils.getRenderedSize(this.containerElt, overlayElt);
-      const { bottom, left, top } = rowActionsButtonCellElt.getBoundingClientRect();
+      const { bottom, left, top } = refButtonElt.getBoundingClientRect();
 
       overlayElt.style.maxHeight = DomUtils.withPx(window.innerHeight);
       overlayElt.style.left =
@@ -816,7 +818,7 @@ export abstract class AbstractTable<T> {
 
       // Append overlay
       this.containerElt.appendChild(overlayElt);
-      rowActionsButtonCellElt.classList.add(TableUtils.ACTIVE_CLS);
+      refButtonElt.classList.add(TableUtils.ACTIVE_CLS);
     }
   }
 
