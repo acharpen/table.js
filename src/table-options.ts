@@ -1,4 +1,4 @@
-export interface TableOptions<T> {
+export type TableOptions<T> = {
   columnMinWidth: number;
   nodeHeight: number;
   visibleNodes: number;
@@ -9,10 +9,8 @@ export interface TableOptions<T> {
   selectable?: boolean | number;
   selectableCheck?: (item: T) => boolean;
   selectableRollingSelection?: boolean;
-}
+};
 
 export type ListTableOptions<T> = TableOptions<T>;
 
-export interface TreeTableOptions<T> extends TableOptions<T> {
-  childNodeOffset: number;
-}
+export type TreeTableOptions<T> = TableOptions<T> & { childNodeOffset: number };

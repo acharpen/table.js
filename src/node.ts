@@ -1,4 +1,4 @@
-export interface Node<T> {
+export type Node<T> = {
   id: number;
   initialPos: number;
   isExpanded: boolean;
@@ -8,12 +8,12 @@ export interface Node<T> {
   isSelected: boolean;
   level: number;
   value: T;
-}
+};
 
-export interface TreeNode<T> {
+export type TreeNode<T> = {
   value: T;
   children: TreeNode<T>[];
-}
+};
 
 export type ListNodeView<T> = Pick<Node<T>, 'id' | 'value' | 'isMatching' | 'isSelected'>;
 

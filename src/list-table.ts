@@ -21,6 +21,7 @@ export class ListTable<T> extends AbstractTable<T> {
         refNodeIndex !== -1 ? (isAbove ? refNodeIndex : refNodeIndex + 1) : isAbove ? 0 : this.nodes.length;
       const [newNode] = this.createNodes([item]);
 
+      // Insert new node
       this.nodes.splice(newNodeIndex, 0, newNode);
 
       // Update initial position of next nodes

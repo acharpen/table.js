@@ -29,13 +29,13 @@ export class TreeTable<T> extends AbstractTable<T> {
   ): void {
     this.runBlockingAction(() => {
       const isAbove = options.position === 'top' || options.position === 'parent';
+      const newNodes = this.createNodes([item]);
+      const newRootNode = newNodes[0];
       const refNodeIndex =
         options.refNodeId != null ? this.nodes.findIndex((node) => node.id === options.refNodeId) : -1;
       const newNodeIndex =
         refNodeIndex !== -1 ? (isAbove ? refNodeIndex : refNodeIndex + 1) : isAbove ? 0 : this.nodes.length;
       const refNode = isAbove ? this.nodes[newNodeIndex] : this.nodes[newNodeIndex - 1];
-      const newNodes = this.createNodes([item]);
-      const newRootNode = newNodes[0];
 
       // Insert new node
       this.nodes.splice(newNodeIndex, 0, newRootNode);
@@ -136,10 +136,10 @@ export class TreeTable<T> extends AbstractTable<T> {
     super.updateVisibleNodes(force);
 
     for (let i = 0, len = this.visibleNodeIndexes.length; i < len; i++) {
-      const node = this.getNodeByIndex(i);
       const firstCellElt = this.getDataCellElts(this.tableBodyRowElts[i])[0];
       const cellContentElt = firstCellElt.lastElementChild as HTMLElement;
       const expandTogglerElt = firstCellElt.firstElementChild as HTMLElement;
+      const node = this.getNodeByIndex(i);
       const nodeOffset = this.childNodeOffset * node.level + (node.isLeaf ? this.expandTogglerWidth : 0);
 
       if (node.isLeaf) {
@@ -150,8 +150,11 @@ export class TreeTable<T> extends AbstractTable<T> {
         expandTogglerElt.classList.remove(TableUtils.HIDDEN_CLS);
         expandTogglerElt.style.marginLeft = `${nodeOffset}px`;
 
-        if (node.isExpanded) expandTogglerElt.classList.add(TableUtils.ACTIVE_CLS);
-        else expandTogglerElt.classList.remove(TableUtils.ACTIVE_CLS);
+        if (node.isExpanded) {
+          expandTogglerElt.classList.add(TableUtils.ACTIVE_CLS);
+        } else {
+          expandTogglerElt.classList.remove(TableUtils.ACTIVE_CLS);
+        }
       }
     }
   }
@@ -186,7 +189,6 @@ export class TreeTable<T> extends AbstractTable<T> {
 
     while (stack.length > 0) {
       const { treeNode, level } = stack.pop() as { treeNode: TreeNode<T>; level: number };
-
       const childItems = treeNode.children;
       const childItemsLength = childItems.length;
       const nextLevel = level + 1;

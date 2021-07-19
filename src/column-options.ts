@@ -1,6 +1,6 @@
 import { ColumnWidthUnit } from './table-utils';
 
-export interface ColumnOptions<T> {
+export type ColumnOptions<T> = {
   align: 'center' | 'left' | 'right';
   formatter: {
     create?: ({ getItem }: { getItem: () => T }) => DocumentFragment;
@@ -15,4 +15,4 @@ export interface ColumnOptions<T> {
   sorter?: (a: T, b: T) => number;
   title?: string;
   width?: { value: number; unit: ColumnWidthUnit };
-}
+};

@@ -1,9 +1,9 @@
-export interface TestObject {
+export type TestObject = {
   col1?: string;
   col2?: string;
   col3?: string;
   col4?: string;
-}
+};
 
 // ////////////////////////////////////////////////////////////////////////////
 
