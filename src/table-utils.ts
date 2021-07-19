@@ -21,6 +21,7 @@ export class TableUtils {
   public static readonly SORT_BUTTON_ASC_CLS: string = `${TableUtils.VENDOR_CLS}-sort-btn-asc`;
   public static readonly SORT_BUTTON_DESC_CLS: string = `${TableUtils.VENDOR_CLS}-sort-btn-desc`;
   public static readonly SORT_BUTTONS_CLS: string = `${TableUtils.VENDOR_CLS}-sort-btns`;
+  public static readonly SPACER_CLS: string = `${TableUtils.VENDOR_CLS}-spacer`;
   public static readonly SPINNER_BOUNCE1_CLS: string = `${TableUtils.VENDOR_CLS}-spinner-bounce1`;
   public static readonly SPINNER_BOUNCE2_CLS: string = `${TableUtils.VENDOR_CLS}-spinner-bounce2`;
   public static readonly SPINNER_CLS: string = `${TableUtils.VENDOR_CLS}-spinner`;

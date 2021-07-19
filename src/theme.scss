@@ -20,6 +20,28 @@ $table-header-height: 40px;
   --oo-table-color-text-primary: #4b5563;
 }
 
+/* Mandatory CSS *********************************************************** */
+
+.oo-table-body {
+  .oo-table-cell,
+  .oo-table-cell-tick,
+  .oo-table-menu-btn {
+    background-color: var(--oo-table-color-bg-primary);
+  }
+}
+
+.oo-table-header {
+  .oo-table-cell,
+  .oo-table-cell-tick,
+  .oo-table-row {
+    background-color: var(--oo-table-color-box-header-blue-bg);
+  }
+
+  .oo-table-row {
+    height: $table-header-height;
+  }
+}
+
 /* Common ****************************************************************** */
 
 * {
@@ -81,20 +103,6 @@ $table-header-height: 40px;
   background-color: var(--oo-table-color-bg-tertiary);
 }
 
-.oo-table-body .oo-table-menu-btn,
-.oo-table-cell-tick,
-.oo-table-cell-tick i,
-.oo-table-sort-btns {
-  justify-content: center;
-}
-
-.oo-table-body .oo-table-menu-btn:hover,
-.oo-table-body .oo-table-menu-btn.oo-table-active,
-.oo-table-cell,
-.oo-table-overlay ul li.oo-table-list-item {
-  color: var(--oo-table-color-text-primary);
-}
-
 .oo-table-expand-toggler:hover,
 .oo-table-expand-toggler.oo-table-active,
 .oo-table-header .oo-table-cell:hover .oo-table-sort-btn-asc:hover,
@@ -102,6 +110,13 @@ $table-header-height: 40px;
   i {
     border-color: var(--oo-table-color-text-primary);
   }
+}
+
+.oo-table-cell-tick,
+.oo-table-cell-tick i,
+.oo-table-menu-btn,
+.oo-table-sort-btns {
+  justify-content: center;
 }
 
 .oo-table,
@@ -138,6 +153,11 @@ $table-header-height: 40px;
 .oo-table::-webkit-scrollbar,
 .oo-table-overlay ul li.oo-table-list-divider {
   background-color: var(--oo-table-color-border-secondary);
+}
+
+.oo-table-cell,
+.oo-table-overlay ul li.oo-table-list-item {
+  color: var(--oo-table-color-text-primary);
 }
 
 .oo-table-cell-content,
@@ -202,7 +222,7 @@ $table-header-height: 40px;
   left: $scrollbar-width;
   position: absolute;
   top: $scrollbar-height;
-  z-index: 10;
+  z-index: 4;
 }
 
 .oo-table-cell {
@@ -237,6 +257,10 @@ $table-header-height: 40px;
   }
 }
 
+.oo-table-spacer {
+  flex-grow: 1;
+}
+
 /* Header ****************************************************************** */
 
 .oo-table-sort-btn-asc,
@@ -259,20 +283,9 @@ $table-header-height: 40px;
 }
 
 .oo-table-header {
-  .oo-table-cell,
-  .oo-table-cell-tick,
-  .oo-table-menu-btn,
-  .oo-table-row {
-    background-color: var(--oo-table-color-box-header-blue-bg); // mandatory
-  }
-
   .oo-table-cell-content {
     display: flex;
     flex-direction: row;
-  }
-
-  .oo-table-row {
-    height: $table-header-height; // mandatory
   }
 
   .oo-table-text-center {
@@ -337,12 +350,6 @@ $table-header-height: 40px;
 /* Body ******************************************************************** */
 
 .oo-table-body {
-  .oo-table-cell,
-  .oo-table-cell-tick,
-  .oo-table-menu-btn {
-    background-color: var(--oo-table-color-bg-primary); // mandatory
-  }
-
   .oo-table-cell-content a {
     color: var(--oo-table-color-text-link);
 
@@ -436,7 +443,7 @@ $table-header-height: 40px;
   box-shadow: rgb(0 0 0 / 13%) 0px 3.2px 7.2px 0px, rgb(0 0 0 / 11%) 0px 0.6px 1.8px 0px;
   overflow: hidden auto;
   position: absolute;
-  z-index: 10;
+  z-index: 3;
 
   ul {
     list-style-type: none;
