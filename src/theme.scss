@@ -33,6 +33,7 @@ $table-header-height: 40px;
 .oo-table-header {
   .oo-table-cell,
   .oo-table-cell-tick,
+  .oo-table-menu-btn,
   .oo-table-row {
     background-color: var(--oo-table-color-box-header-blue-bg);
   }
@@ -48,15 +49,15 @@ $table-header-height: 40px;
   box-sizing: border-box;
 }
 
-.oo-table-header .oo-table-row:hover .oo-table-resize-handle:hover::before,
-.oo-table-menu-btn:hover i,
-.oo-table-menu-btn:hover i::after,
-.oo-table-menu-btn:hover i::before,
-.oo-table-menu-btn.oo-table-active i,
-.oo-table-menu-btn.oo-table-active i::after,
-.oo-table-menu-btn.oo-table-active i::before,
-.oo-table-row.oo-table-selected .oo-table-cell-tick i::before {
-  background-color: var(--oo-table-color-text-primary);
+.oo-table::-webkit-scrollbar-thumb,
+.oo-table-body .oo-table-menu-btn i,
+.oo-table-body .oo-table-menu-btn i::after,
+.oo-table-body .oo-table-menu-btn i::before,
+.oo-table-header .oo-table-cell:hover .oo-table-menu-btn i,
+.oo-table-header .oo-table-cell:hover .oo-table-menu-btn i::after,
+.oo-table-header .oo-table-cell:hover .oo-table-menu-btn i::before,
+.oo-table-header .oo-table-row:hover .oo-table-resize-handle::before {
+  background-color: var(--oo-table-color-border-primary);
 }
 
 .oo-table-body .oo-table-cell-content a,
@@ -86,14 +87,6 @@ $table-header-height: 40px;
 .oo-table-header .oo-table-cell:hover .oo-table-sort-btn-asc i,
 .oo-table-header .oo-table-cell:hover .oo-table-sort-btn-desc i {
   border-color: var(--oo-table-color-border-primary);
-}
-
-.oo-table::-webkit-scrollbar-thumb,
-.oo-table-header .oo-table-row:hover .oo-table-resize-handle::before,
-.oo-table-menu-btn i,
-.oo-table-menu-btn i::after,
-.oo-table-menu-btn i::before {
-  background-color: var(--oo-table-color-border-primary);
 }
 
 .oo-table-body .oo-table-row.oo-table-selected .oo-table-cell,
@@ -172,6 +165,11 @@ $table-header-height: 40px;
   width: 32px;
 }
 
+.oo-table-header .oo-table-row:hover .oo-table-resize-handle:hover::before,
+.oo-table-row.oo-table-selected .oo-table-cell-tick i::before {
+  background-color: var(--oo-table-color-text-primary);
+}
+
 .oo-table-selection-all,
 .oo-table-selection-multiple {
   .oo-table-cell-tick i {
@@ -242,6 +240,19 @@ $table-header-height: 40px;
 
   &::before {
     content: "";
+  }
+}
+
+.oo-table-menu-btn {
+  &:hover,
+  &.oo-table-active {
+    i {
+      &,
+      &::after,
+      &::before {
+        background-color: var(--oo-table-color-text-primary) !important;
+      }
+    }
   }
 }
 
