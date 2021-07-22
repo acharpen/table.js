@@ -465,6 +465,8 @@ export abstract class AbstractTable<T> {
     }
 
     elt.appendChild(DomUtils.createElt('i'));
+    elt.appendChild(DomUtils.createElt('i'));
+    elt.appendChild(DomUtils.createElt('i'));
 
     return elt;
   }
