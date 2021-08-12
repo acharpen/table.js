@@ -40,7 +40,7 @@ const treeData = [...Array(1e5).keys()].map((i) => ({
   }
 }));
 
-const containerElt = document.getElementById('table-container') as HTMLElement;
+const containerElt = document.getElementById('table-container');
 const table = new TreeTable<ExampleObject>(containerElt, {
   columnOptions,
   tableOptions: { ...tableOptions, childNodeOffset: 8 }

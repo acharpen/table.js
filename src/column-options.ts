@@ -4,7 +4,7 @@ export type ColumnOptions<T> = {
   align: 'center' | 'left' | 'right';
   formatter: {
     create?: ({ getItem }: { getItem: () => T }) => DocumentFragment;
-    update: (elt: HTMLElement, { item, prevItem }: { item: T; prevItem: T | null }) => void;
+    update: (elt: Element, { item, prevItem }: { item: T; prevItem: T | null }) => void;
   };
   id: number;
   order: number;

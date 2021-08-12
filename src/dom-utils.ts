@@ -14,7 +14,7 @@ export class DomUtils {
     return parseFloat(getComputedStyle(elt).getPropertyValue('width').replace('px', ''));
   }
 
-  public static getRenderedSize(containerElt: HTMLElement, elt: HTMLElement): { height: number; width: number } {
+  public static getRenderedSize(containerElt: Element, elt: Element): { height: number; width: number } {
     const clone = elt.cloneNode(true) as HTMLElement;
     clone.style.visibility = 'hidden';
 

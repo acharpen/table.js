@@ -7,10 +7,8 @@ export type TestObject = {
 
 // ////////////////////////////////////////////////////////////////////////////
 
-export const updateTextElt = (
-  field: keyof TestObject
-): ((elt: HTMLElement, { item }: { item: TestObject }) => void) => {
-  return (elt: HTMLElement, { item }: { item: TestObject }): void => {
+export const updateTextElt = (field: keyof TestObject): ((elt: Element, { item }: { item: TestObject }) => void) => {
+  return (elt: Element, { item }: { item: TestObject }): void => {
     elt.textContent = item[field] ?? '';
   };
 };

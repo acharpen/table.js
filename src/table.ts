@@ -200,7 +200,7 @@ export abstract class AbstractTable<T> {
     this.runBlockingAction(() => {
       const targetColumn = this.dataColumns.find((column) => column.id === columnId);
 
-      if (targetColumn?.sorter != null) {
+      if (targetColumn?.sorter) {
         this.currSort =
           sortOrder === 'default' ? null : { sortOrder, column: targetColumn, sorter: targetColumn.sorter };
 
@@ -223,7 +223,7 @@ export abstract class AbstractTable<T> {
   protected createTableBodyCellElt(column: Column<T>, ctx: { nodeIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CLS);
 
-    if (column.pinned != null) {
+    if (column.pinned) {
       const targetColumnIndex = this.dataColumns.findIndex((_column) => _column.id === column.id);
 
       elt.classList.add(TableUtils.STICKY_CLS);
@@ -339,10 +339,8 @@ export abstract class AbstractTable<T> {
     let rowActionsButtonCellWidth = 0;
 
     if (this.options.rowActions) {
-      const rowActionsButtonElt = this.tableHeaderRowElt.lastElementChild as HTMLElement;
-
-      if (rowActionsButtonElt.classList.contains(TableUtils.STICKY_CLS)) {
-        rowActionsButtonCellWidth = DomUtils.getComputedWidth(rowActionsButtonElt);
+      if (this.tableHeaderRowElt.lastElementChild?.classList.contains(TableUtils.STICKY_CLS) ?? false) {
+        rowActionsButtonCellWidth = DomUtils.getComputedWidth(this.tableHeaderRowElt.lastElementChild as Element);
       }
     }
 
@@ -353,10 +351,8 @@ export abstract class AbstractTable<T> {
     let tickCellWidth = 0;
 
     if (this.isSelectionEnabled()) {
-      const tickCellElt = this.tableHeaderRowElt.firstElementChild as HTMLElement;
-
-      if (tickCellElt.classList.contains(TableUtils.STICKY_CLS)) {
-        tickCellWidth = DomUtils.getComputedWidth(tickCellElt);
+      if (this.tableHeaderRowElt.firstElementChild?.classList.contains(TableUtils.STICKY_CLS) ?? false) {
+        tickCellWidth = DomUtils.getComputedWidth(this.tableHeaderRowElt.firstElementChild as Element);
       }
     }
 
@@ -383,7 +379,7 @@ export abstract class AbstractTable<T> {
 
       onClose?.();
 
-      if (!(event.target as HTMLElement).closest(`.${TableUtils.OVERLAY_CLS}`)) {
+      if (event.target && !(event.target as HTMLElement).closest(`.${TableUtils.OVERLAY_CLS}`)) {
         event.stopPropagation();
       }
     };
@@ -537,13 +533,13 @@ export abstract class AbstractTable<T> {
 
     elt.addEventListener('mouseup', () => this.onClickTableHeaderCell(ctx.columnIndex), false);
 
-    if (column.pinned != null) {
+    if (column.pinned) {
       elt.classList.add(TableUtils.STICKY_CLS);
     }
 
     elt.appendChild(this.createTableHeaderCellContentElt(column, ctx));
 
-    if (column.resizable != null) {
+    if (column.resizable ?? false) {
       elt.appendChild(this.createResizeHandleElt(ctx));
     }
 
@@ -628,12 +624,12 @@ export abstract class AbstractTable<T> {
     this.selectedNodeIds = this.selectedNodeIds.filter((nodeId) => !nodeIdSet.has(nodeId));
   }
 
-  private getColumnSortButtons(headerCellElt: HTMLElement): { sortAscElt: HTMLElement; sortDescElt: HTMLElement } {
-    const sortButtonsElt = headerCellElt.getElementsByClassName(TableUtils.SORT_BUTTONS_CLS).item(0) as HTMLElement;
+  private getColumnSortButtons(headerCellElt: HTMLElement): { sortAscElt: Element; sortDescElt: Element } {
+    const sortButtonsElt = headerCellElt.getElementsByClassName(TableUtils.SORT_BUTTONS_CLS).item(0) as Element;
 
     return {
-      sortAscElt: sortButtonsElt.firstElementChild as HTMLElement,
-      sortDescElt: sortButtonsElt.lastElementChild as HTMLElement
+      sortAscElt: sortButtonsElt.firstElementChild as Element,
+      sortDescElt: sortButtonsElt.lastElementChild as Element
     };
   }
 
@@ -775,52 +771,54 @@ export abstract class AbstractTable<T> {
   }
 
   private onClickTableBodyRowActionsButton(nodeIndex: number, event: Event): void {
-    const eventTarget = event.target as HTMLElement;
-    const refButtonElt = eventTarget.closest(`.${TableUtils.TABLE_ROW_ACTIONS_HANDLE_CLS}`) as HTMLElement;
-
     if (this.options.rowActions && this.options.rowActions.length > 0) {
-      const listElt = DomUtils.createElt('ul');
-      const node = this.getNodeByIndex(nodeIndex);
-      const overlayElt = this.createOverlayElt({
-        onClose: () => refButtonElt.classList.remove(TableUtils.ACTIVE_CLS)
-      });
+      const eventTarget = event.target as HTMLElement | null;
+      const refButtonElt = eventTarget?.closest(`.${TableUtils.TABLE_ROW_ACTIONS_HANDLE_CLS}`);
 
-      const createRowActionsGroup = (rowActions: { callback: (item: T) => void; label: string }[]): void => {
-        for (let i = 0, len = rowActions.length; i < len; i++) {
-          const rowAction = rowActions[i];
-          const listItemElt = DomUtils.createElt('li', TableUtils.LIST_ITEM_CLS);
-          listItemElt.appendChild(document.createTextNode(rowAction.label));
+      if (refButtonElt) {
+        const listElt = DomUtils.createElt('ul');
+        const node = this.getNodeByIndex(nodeIndex);
+        const overlayElt = this.createOverlayElt({
+          onClose: () => refButtonElt.classList.remove(TableUtils.ACTIVE_CLS)
+        });
+
+        const createRowActionsGroup = (rowActions: { callback: (item: T) => void; label: string }[]): void => {
+          for (let i = 0, len = rowActions.length; i < len; i++) {
+            const rowAction = rowActions[i];
+            const listItemElt = DomUtils.createElt('li', TableUtils.LIST_ITEM_CLS);
+            listItemElt.appendChild(document.createTextNode(rowAction.label));
+            listElt.appendChild(listItemElt);
+
+            listItemElt.addEventListener('mouseup', () => rowAction.callback(node.value));
+          }
+        };
+
+        // Create overlay content
+        createRowActionsGroup(this.options.rowActions[0]);
+        for (let i = 1, len = this.options.rowActions.length; i < len; i++) {
+          const listItemElt = DomUtils.createElt('li', TableUtils.LIST_DIVIDER_CLS);
           listElt.appendChild(listItemElt);
-
-          listItemElt.addEventListener('mouseup', () => rowAction.callback(node.value));
+          const group = this.options.rowActions[i];
+          createRowActionsGroup(group);
         }
-      };
+        overlayElt.appendChild(listElt);
 
-      // Create overlay content
-      createRowActionsGroup(this.options.rowActions[0]);
-      for (let i = 1, len = this.options.rowActions.length; i < len; i++) {
-        const listItemElt = DomUtils.createElt('li', TableUtils.LIST_DIVIDER_CLS);
-        listElt.appendChild(listItemElt);
-        const group = this.options.rowActions[i];
-        createRowActionsGroup(group);
+        // Set overlay position and size
+        const { height, width } = DomUtils.getRenderedSize(this.containerElt, overlayElt);
+        const { bottom, left, top } = refButtonElt.getBoundingClientRect();
+
+        overlayElt.style.maxHeight = DomUtils.withPx(window.innerHeight);
+        overlayElt.style.left =
+          width + left + this.rowActionsButtonCellWidth <= window.innerWidth
+            ? DomUtils.withPx(left + this.rowActionsButtonCellWidth)
+            : DomUtils.withPx(left - width);
+        overlayElt.style.top =
+          top + height <= window.innerHeight ? DomUtils.withPx(top) : DomUtils.withPx(bottom - height);
+
+        // Append overlay
+        this.containerElt.appendChild(overlayElt);
+        refButtonElt.classList.add(TableUtils.ACTIVE_CLS);
       }
-      overlayElt.appendChild(listElt);
-
-      // Set overlay position and size
-      const { height, width } = DomUtils.getRenderedSize(this.containerElt, overlayElt);
-      const { bottom, left, top } = refButtonElt.getBoundingClientRect();
-
-      overlayElt.style.maxHeight = DomUtils.withPx(window.innerHeight);
-      overlayElt.style.left =
-        width + left + this.rowActionsButtonCellWidth <= window.innerWidth
-          ? DomUtils.withPx(left + this.rowActionsButtonCellWidth)
-          : DomUtils.withPx(left - width);
-      overlayElt.style.top =
-        top + height <= window.innerHeight ? DomUtils.withPx(top) : DomUtils.withPx(bottom - height);
-
-      // Append overlay
-      this.containerElt.appendChild(overlayElt);
-      refButtonElt.classList.add(TableUtils.ACTIVE_CLS);
     }
   }
 
@@ -1030,7 +1028,7 @@ export abstract class AbstractTable<T> {
 
     const stickyDataColumnsWidth = [];
     for (let i = 0, dataColumnsLen = this.dataColumns.length; i < dataColumnsLen; i++) {
-      stickyDataColumnsWidth.push(this.dataColumns[i].pinned != null ? DomUtils.getWidth(tableHeaderCellElts[i]) : 0);
+      stickyDataColumnsWidth.push(this.dataColumns[i].pinned ? DomUtils.getWidth(tableHeaderCellElts[i]) : 0);
     }
     const stickyDataColumnsWidthLen = stickyDataColumnsWidth.length;
 

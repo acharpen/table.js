@@ -7,7 +7,7 @@ export type ExampleObject = {
 
 // ////////////////////////////////////////////////////////////////////////////
 
-const createLinkElt = ({ getItem }: { getItem: () => ExampleObject }): HTMLElement => {
+const createLinkElt = ({ getItem }: { getItem: () => ExampleObject }): DocumentFragment => {
   const elt = document.createElement('a');
   elt.addEventListener('mouseup', (event) => {
     event.stopPropagation();
@@ -15,13 +15,16 @@ const createLinkElt = ({ getItem }: { getItem: () => ExampleObject }): HTMLEleme
     console.log(getItem());
   });
 
-  return elt;
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(elt);
+
+  return fragment;
 };
 
 const updateLinkElt = (
   field: keyof ExampleObject
-): ((elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }) => void) => {
-  return (elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }): void => {
+): ((elt: Element, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }) => void) => {
+  return (elt: Element, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }): void => {
     const displayedValue = item[field];
     const prevDisplayedValue = prevItem?.[field];
 
@@ -31,8 +34,8 @@ const updateLinkElt = (
 
 const updateTextElt = (
   field: keyof ExampleObject
-): ((elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }) => void) => {
-  return (elt: HTMLElement, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }): void => {
+): ((elt: Element, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }) => void) => {
+  return (elt: Element, { item, prevItem }: { item: ExampleObject; prevItem: ExampleObject | null }): void => {
     const displayedValue = item[field];
     const prevDisplayedValue = prevItem?.[field];
 

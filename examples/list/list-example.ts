@@ -8,7 +8,7 @@ const listData = [...Array(1e5).keys()].map((i) => ({
   col4: `value${i}4`
 }));
 
-const containerElt = document.getElementById('table-container') as HTMLElement;
+const containerElt = document.getElementById('table-container');
 const table = new ListTable<ExampleObject>(containerElt, { columnOptions, tableOptions });
 
 table.setData(listData);
