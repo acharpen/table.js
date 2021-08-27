@@ -532,7 +532,9 @@ export abstract class AbstractTable<T> {
       }
     }
 
-    elt.appendChild(this.tableHeaderElt);
+    if (this.dataColumns.some((column) => column.title != null && column.title !== '')) {
+      elt.appendChild(this.tableHeaderElt);
+    }
     elt.appendChild(this.tableBodyWrapperElt);
     elt.appendChild(this.virtualScrollSpacerElt);
 
