@@ -401,6 +401,18 @@ $table-header-height: 40px;
       }
     }
 
+    &.oo-table-condensed {
+      height: 40px;
+    }
+
+    &.oo-table-regular {
+      height: 48px;
+    }
+
+    &.oo-table-relaxed {
+      height: 56px;
+    }
+
     &.oo-table-unselectable .oo-table-cell-tick i {
       cursor: not-allowed;
     }

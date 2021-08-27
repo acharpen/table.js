@@ -1,6 +1,5 @@
 export type TableOptions<T> = {
   columnMinWidth: number;
-  nodeHeight: number;
   visibleNodes: number;
 
   classList?: string[];

@@ -69,7 +69,7 @@ export class TreeTable<T> extends AbstractTable<T> {
         .slice(newNodeIndex + newNodes.length + 1)
         .forEach((node) => (node.initialPos = node.initialPos + newNodes.length));
 
-      this.updateNodes();
+      this.updateNodes({ forceTableRendering: true });
     });
   }
 

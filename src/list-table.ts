@@ -27,7 +27,7 @@ export class ListTable<T> extends AbstractTable<T> {
       // Update initial position of next nodes
       this.nodes.slice(newNodeIndex + 1).forEach((node) => (node.initialPos = node.initialPos + 1));
 
-      this.updateNodes();
+      this.updateNodes({ forceTableRendering: true });
     });
   }
 
