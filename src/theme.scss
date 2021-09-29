@@ -309,7 +309,7 @@ $table-header-height: 40px;
 
 .oo-table-text-center,
 .oo-table-text-left {
-  .oo-table-sort-btns {
+  .oo-table-header-title + div {
     margin-left: 8px;
   }
 }
@@ -375,7 +375,7 @@ $table-header-height: 40px;
   width: $sort-button-width;
 }
 
-.oo-table-text-right .oo-table-sort-btns {
+.oo-table-text-right .oo-table-header-title + div {
   margin-right: 8px;
 }
 
