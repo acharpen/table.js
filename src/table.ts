@@ -23,16 +23,16 @@ export abstract class AbstractTable<T> {
   protected nodes: Node<T>[];
   protected visibleNodeIndexes: number[];
 
-  private readonly rowActionsButtonCellWidth: number;
-  private readonly tickCellWidth: number;
   private activeNodeIndexes: number[];
   private counter: number;
   private currFilter: { matcher: (value: T) => boolean } | null;
   private currRangeStart: number | null;
   private currSort: { column: Column<T>; sorter: (a: T, b: T) => number; sortOrder: SortOrder } | null;
   private prevRangeStart: number | null;
+  private rowActionsButtonCellWidth: number;
   private rowHeight: number;
   private selectedNodeIds: number[];
+  private tickCellWidth: number;
 
   protected constructor(
     containerElt: HTMLElement,
@@ -48,8 +48,10 @@ export abstract class AbstractTable<T> {
     this.nodes = [];
     this.options = tableOptions;
     this.prevRangeStart = null;
+    this.rowActionsButtonCellWidth = 0;
     this.rowHeight = 0;
     this.selectedNodeIds = [];
+    this.tickCellWidth = 0;
     this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING;
     this.visibleNodeIndexes = [];
 
@@ -60,9 +62,6 @@ export abstract class AbstractTable<T> {
     this.tableHeaderRowElt = this.createTableHeaderRowElt();
     this.tableHeaderElt = this.createTableHeaderElt();
     this.tableElt = this.createTableElt();
-
-    this.rowActionsButtonCellWidth = this.computeRowActionsButtonCellWidth();
-    this.tickCellWidth = this.computeTickCellWidth();
   }
 
   // ////////////////////////////////////////////////////////////////////////////
@@ -264,6 +263,9 @@ export abstract class AbstractTable<T> {
 
     this.containerElt.appendChild(this.tableElt);
 
+    this.rowActionsButtonCellWidth = this.computeRowActionsButtonCellWidth();
+    this.tickCellWidth = this.computeTickCellWidth();
+
     this.setStickyColumnsPosition();
   }
 
@@ -363,9 +365,7 @@ export abstract class AbstractTable<T> {
     let tickCellWidth = 0;
 
     if (this.isSelectionEnabled()) {
-      if (this.tableHeaderRowElt.firstElementChild?.classList.contains(TableUtils.STICKY_CLS) ?? false) {
-        tickCellWidth = DomUtils.getComputedWidth(this.tableHeaderRowElt.firstElementChild as Element);
-      }
+      tickCellWidth = DomUtils.getComputedWidth(this.tableHeaderRowElt.firstElementChild as Element);
     }
 
     return tickCellWidth;
@@ -469,7 +469,7 @@ export abstract class AbstractTable<T> {
     );
 
     if (this.dataColumns.every((column) => column.pinned !== 'right')) {
-      elt.classList.add(TableUtils.STICKY_LEFTMOST_CLS);
+      elt.classList.add(TableUtils.STICKY_CLS, TableUtils.STICKY_LEFTMOST_CLS);
     }
 
     elt.appendChild(DomUtils.createElt('i'));
@@ -596,7 +596,7 @@ export abstract class AbstractTable<T> {
       );
 
       if (this.dataColumns.every((column) => column.pinned !== 'right')) {
-        rowActionsButtonElt.classList.add(TableUtils.STICKY_LEFTMOST_CLS);
+        rowActionsButtonElt.classList.add(TableUtils.STICKY_CLS, TableUtils.STICKY_LEFTMOST_CLS);
       }
 
       elt.appendChild(rowActionsButtonElt);
