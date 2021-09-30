@@ -352,6 +352,44 @@ $table-header-height: 40px;
   }
 }
 
+.oo-table-row-height-opts {
+  align-items: center;
+
+  .oo-table-condensed,
+  .oo-table-regular,
+  .oo-table-relaxed {
+    display: flex;
+    flex-direction: column;
+    height: 18px;
+    justify-content: space-evenly;
+
+    &:hover,
+    &.oo-table-active {
+      i {
+        background-color: var(--oo-table-color-text-primary);
+      }
+    }
+
+    i {
+      background-color: var(--oo-table-color-border-primary);
+      height: 2px;
+      width: 16px;
+    }
+  }
+
+  .oo-table-condensed {
+    margin-right: 12px;
+  }
+
+  .oo-table-regular {
+    margin: 0 12px;
+  }
+
+  .oo-table-relaxed {
+    margin-left: 12px;
+  }
+}
+
 .oo-table-sort-btn-asc {
   top: 4px;
 
@@ -400,18 +438,6 @@ $table-header-height: 40px;
           background-color: var(--oo-table-color-border-secondary);
         }
       }
-    }
-
-    &.oo-table-condensed {
-      height: 40px;
-    }
-
-    &.oo-table-regular {
-      height: 48px;
-    }
-
-    &.oo-table-relaxed {
-      height: 56px;
     }
 
     &.oo-table-unselectable .oo-table-cell-tick i {
@@ -477,6 +503,8 @@ $table-header-height: 40px;
       }
 
       &.oo-table-list-item {
+        display: flex;
+        flex-direction: row;
         height: 36px;
         line-height: 36px;
         padding-left: 16px;

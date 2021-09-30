@@ -24,13 +24,14 @@ export abstract class AbstractTable<T> {
   protected visibleNodeIndexes: number[];
 
   private activeNodeIndexes: number[];
+  private cellContentHeight: number;
   private counter: number;
+  private currCellPadding: 4 | 8 | 16;
   private currFilter: { matcher: (value: T) => boolean } | null;
   private currRangeStart: number | null;
   private currSort: { column: Column<T>; sorter: (a: T, b: T) => number; sortOrder: SortOrder } | null;
   private prevRangeStart: number | null;
   private rowActionsButtonCellWidth: number;
-  private rowHeight: number;
   private selectedNodeIds: number[];
   private tickCellWidth: number;
 
@@ -39,8 +40,10 @@ export abstract class AbstractTable<T> {
     { columnOptions, tableOptions }: { columnOptions: ColumnOptions<T>[]; tableOptions: TableOptions<T> }
   ) {
     this.activeNodeIndexes = [];
+    this.cellContentHeight = 0;
     this.containerElt = containerElt;
     this.counter = 0;
+    this.currCellPadding = 8;
     this.currFilter = null;
     this.currRangeStart = null;
     this.currSort = null;
@@ -49,7 +52,6 @@ export abstract class AbstractTable<T> {
     this.options = tableOptions;
     this.prevRangeStart = null;
     this.rowActionsButtonCellWidth = 0;
-    this.rowHeight = 0;
     this.selectedNodeIds = [];
     this.tickCellWidth = 0;
     this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING;
@@ -300,16 +302,13 @@ export abstract class AbstractTable<T> {
       // Render first node to compute row height
       this.populateRowContent(this.nodes[0], this.tableBodyRowElts[0], 0);
 
-      this.rowHeight = DomUtils.getComputedHeight(this.tableBodyRowElts[0]);
+      this.cellContentHeight = DomUtils.getComputedHeight(this.tableBodyRowElts[0]);
     } else {
-      this.rowHeight = 0;
+      this.cellContentHeight = 0;
     }
 
-    // Update rows height
-    const rowHeightPx = DomUtils.withPx(this.rowHeight);
-    this.tableBodyRowElts.forEach((elt) => (elt.style.height = rowHeightPx));
-
     this.resetColumnSortButtons();
+    this.setRowHeight();
 
     this.updateNodes({ forceTableRendering: true });
   }
@@ -334,12 +333,13 @@ export abstract class AbstractTable<T> {
   }
 
   protected updateVisibleNodes(force = false): void {
-    const newRangeStart = Math.floor(this.tableElt.scrollTop / this.rowHeight);
+    const rowHeight = this.getRowHeight();
+    const newRangeStart = Math.floor(this.tableElt.scrollTop / rowHeight);
 
     if (force || newRangeStart !== this.currRangeStart) {
       this.prevRangeStart = force ? null : this.currRangeStart;
       this.currRangeStart = newRangeStart;
-      this.tableBodyElt.style.transform = `translateY(${DomUtils.withPx(newRangeStart * this.rowHeight)})`;
+      this.tableBodyElt.style.transform = `translateY(${DomUtils.withPx(newRangeStart * rowHeight)})`;
       this.visibleNodeIndexes = this.activeNodeIndexes.slice(newRangeStart, newRangeStart + this.virtualNodesCount);
 
       this.hideUnusedTableBodyRowElts();
@@ -541,6 +541,25 @@ export abstract class AbstractTable<T> {
     return elt;
   }
 
+  private createTableHeaderActionsButtonElt(): HTMLElement {
+    const elt = DomUtils.createElt('div', TableUtils.MENU_BUTTON_CLS);
+
+    elt.addEventListener(
+      'mouseup',
+      (event) => {
+        event.stopPropagation();
+        this.onClickTableHeaderActionsButton(event);
+      },
+      false
+    );
+
+    elt.appendChild(DomUtils.createElt('i'));
+    elt.appendChild(DomUtils.createElt('i'));
+    elt.appendChild(DomUtils.createElt('i'));
+
+    return elt;
+  }
+
   private createTableHeaderCellElt(column: Column<T>, ctx: { columnIndex: number }): HTMLElement {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CLS);
 
@@ -563,6 +582,7 @@ export abstract class AbstractTable<T> {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_CONTENT_CLS, TableUtils.getTextAlignCls(column.align));
 
     elt.appendChild(this.createTableHeaderTitleElt(column));
+    elt.appendChild(this.createTableHeaderActionsButtonElt());
 
     if (column.sorter) {
       elt.appendChild(this.createSortButtonsElt(ctx));
@@ -666,6 +686,10 @@ export abstract class AbstractTable<T> {
     }
 
     return nodes;
+  }
+
+  private getRowHeight(): number {
+    return this.cellContentHeight + 2 * this.currCellPadding;
   }
 
   private handleFilter(): void {
@@ -786,7 +810,7 @@ export abstract class AbstractTable<T> {
   private onClickTableBodyRowActionsButton(nodeIndex: number, event: Event): void {
     if (this.options.rowActions && this.options.rowActions.length > 0) {
       const eventTarget = event.target as HTMLElement | null;
-      const refButtonElt = eventTarget?.closest(`.${TableUtils.TABLE_ROW_ACTIONS_HANDLE_CLS}`);
+      const refButtonElt = eventTarget?.closest(`.${TableUtils.MENU_BUTTON_CLS}`);
 
       if (refButtonElt) {
         const listElt = DomUtils.createElt('ul');
@@ -832,6 +856,67 @@ export abstract class AbstractTable<T> {
         this.containerElt.appendChild(overlayElt);
         refButtonElt.classList.add(TableUtils.ACTIVE_CLS);
       }
+    }
+  }
+
+  private onClickTableHeaderActionsButton(event: Event): void {
+    const eventTarget = event.target as HTMLElement | null;
+    const refButtonElt = eventTarget?.closest(`.${TableUtils.MENU_BUTTON_CLS}`);
+
+    if (refButtonElt) {
+      const listElt = DomUtils.createElt('ul');
+      const overlayElt = this.createOverlayElt({ onClose: () => refButtonElt.classList.remove(TableUtils.ACTIVE_CLS) });
+      const rowHeightElt = DomUtils.createElt('li', TableUtils.LIST_ITEM_CLS, TableUtils.TABLE_ROW_HEIGHT_OPTS_CLS);
+
+      const rowHeightItemElt = (cellPadding: 4 | 8 | 16): HTMLElement => {
+        const rowHeightCls =
+          cellPadding === 4
+            ? TableUtils.CONDENSED_CLS
+            : cellPadding === 8
+            ? TableUtils.REGULAR_CLS
+            : TableUtils.RELAXED_CLS;
+        const elt = DomUtils.createElt('div', rowHeightCls);
+
+        if (this.currCellPadding === cellPadding) {
+          elt.classList.add(TableUtils.ACTIVE_CLS);
+        }
+
+        elt.addEventListener('mouseup', () => {
+          this.currCellPadding = cellPadding;
+
+          this.setRowHeight();
+
+          this.updateNodes({ forceTableRendering: true });
+        });
+
+        elt.appendChild(DomUtils.createElt('i'));
+        elt.appendChild(DomUtils.createElt('i'));
+        if (cellPadding === 4 || cellPadding === 8) {
+          elt.appendChild(DomUtils.createElt('i'));
+        }
+        if (cellPadding === 4) {
+          elt.appendChild(DomUtils.createElt('i'));
+        }
+
+        return elt;
+      };
+
+      rowHeightElt.appendChild(rowHeightItemElt(4));
+      rowHeightElt.appendChild(rowHeightItemElt(8));
+      rowHeightElt.appendChild(rowHeightItemElt(16));
+      listElt.appendChild(rowHeightElt);
+      overlayElt.appendChild(listElt);
+
+      // Set overlay position and size
+      const { bottom, left } = refButtonElt.getBoundingClientRect();
+
+      overlayElt.style.maxHeight = DomUtils.withPx(window.innerHeight);
+      overlayElt.style.left = DomUtils.withPx(left);
+      overlayElt.style.top = DomUtils.withPx(bottom);
+
+      // Append overlay
+      this.containerElt.appendChild(overlayElt);
+      refButtonElt.classList.add(TableUtils.ACTIVE_CLS);
     }
   }
 
@@ -1035,6 +1120,11 @@ export abstract class AbstractTable<T> {
     }
   }
 
+  private setRowHeight(): void {
+    const rowHeightPx = DomUtils.withPx(this.getRowHeight());
+    this.tableBodyRowElts.forEach((elt) => (elt.style.height = rowHeightPx));
+  }
+
   private setStickyColumnsPosition(): void {
     const tableHeaderCellElts = this.getDataCellElts(this.tableHeaderRowElt);
 
@@ -1075,12 +1165,14 @@ export abstract class AbstractTable<T> {
   }
 
   private updateTableElements(): void {
+    const rowHeight = this.getRowHeight();
+
     // Table body wrapper
-    const tableBodyWrapperheight = Math.min(this.activeNodeIndexes.length, this.options.visibleNodes) * this.rowHeight;
+    const tableBodyWrapperheight = Math.min(this.activeNodeIndexes.length, this.options.visibleNodes) * rowHeight;
     this.tableBodyWrapperElt.style.height = DomUtils.withPx(tableBodyWrapperheight);
 
     // Virtual scroll spacer
-    const virtualScrollSpacerHeight = this.activeNodeIndexes.length * this.rowHeight;
+    const virtualScrollSpacerHeight = this.activeNodeIndexes.length * rowHeight;
     this.virtualScrollSpacerElt.style.height = DomUtils.withPx(virtualScrollSpacerHeight);
   }
 }

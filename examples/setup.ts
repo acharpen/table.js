@@ -96,7 +96,6 @@ export const tableOptions = {
     [{ callback: () => console.log('First Action'), label: 'First Action' }],
     [{ callback: () => console.log('Second Action'), label: 'Second Action' }]
   ],
-  rowClassList: () => ['oo-table-condensed'],
   selectable: true,
   visibleNodes: 10
 };

@@ -7,12 +7,15 @@ export class TableUtils {
 
   public static readonly ACTIVE_CLS: string = `${TableUtils.VENDOR_CLS}-active`;
   public static readonly BLOCKING_CLS: string = `${TableUtils.VENDOR_CLS}-blocking`;
+  public static readonly CONDENSED_CLS: string = `${TableUtils.VENDOR_CLS}-condensed`;
   public static readonly EXPAND_TOGGLER_CLS: string = `${TableUtils.VENDOR_CLS}-expand-toggler`;
   public static readonly HIDDEN_CLS: string = `${TableUtils.VENDOR_CLS}-hidden`;
   public static readonly LIST_DIVIDER_CLS: string = `${TableUtils.VENDOR_CLS}-list-divider`;
   public static readonly LIST_ITEM_CLS: string = `${TableUtils.VENDOR_CLS}-list-item`;
   public static readonly MENU_BUTTON_CLS: string = `${TableUtils.VENDOR_CLS}-menu-btn`;
   public static readonly OVERLAY_CLS: string = `${TableUtils.VENDOR_CLS}-overlay`;
+  public static readonly REGULAR_CLS: string = `${TableUtils.VENDOR_CLS}-regular`;
+  public static readonly RELAXED_CLS: string = `${TableUtils.VENDOR_CLS}-relaxed`;
   public static readonly RESIZE_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-resize-handle`;
   public static readonly SELECTED_CLS: string = `${TableUtils.VENDOR_CLS}-selected`;
   public static readonly SELECTION_ALL_CLS: string = `${TableUtils.VENDOR_CLS}-selection-all`;
@@ -36,6 +39,7 @@ export class TableUtils {
   public static readonly TABLE_HEADER_CLS: string = `${TableUtils.VENDOR_CLS}-header`;
   public static readonly TABLE_HEADER_TITLE_CLS: string = `${TableUtils.VENDOR_CLS}-header-title`;
   public static readonly TABLE_ROW_ACTIONS_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-row-actions-btn`;
+  public static readonly TABLE_ROW_HEIGHT_OPTS_CLS: string = `${TableUtils.VENDOR_CLS}-row-height-opts`;
   public static readonly TABLE_ROW_CLS: string = `${TableUtils.VENDOR_CLS}-row`;
   public static readonly UNSELECTABLE_CLS: string = `${TableUtils.VENDOR_CLS}-unselectable`;
   public static readonly VIRTUAL_SCROLL_SPACER_CLS: string = `${TableUtils.VENDOR_CLS}-virtual-scroll-spacer`;
