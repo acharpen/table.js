@@ -104,6 +104,22 @@ export abstract class AbstractTable<T> {
     });
   }
 
+  public replaceNodes(list: { newItem: T; nodeId: number }[]): void {
+    this.runBlockingAction(() => {
+      const listToUpdate = list
+        .map((elt) => ({ newItem: elt.newItem, node: this.nodes.find((node) => node.id === elt.nodeId) }))
+        .filter(({ node }) => node != null);
+
+      listToUpdate.forEach(({ newItem, node }) => {
+        (node as Node<T>).value = newItem;
+      });
+
+      if (listToUpdate.length > 0) {
+        this.updateNodes({ forceTableRendering: true });
+      }
+    });
+  }
+
   public selectNodes(nodeIds: number[]): void {
     this.runBlockingAction(() => {
       if (this.isSelectionEnabled()) {
