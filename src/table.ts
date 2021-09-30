@@ -882,9 +882,13 @@ export abstract class AbstractTable<T> {
     if (refButtonElt) {
       const listElt = DomUtils.createElt('ul');
       const overlayElt = this.createOverlayElt({ onClose: () => refButtonElt.classList.remove(TableUtils.ACTIVE_CLS) });
-      const rowHeightElt = DomUtils.createElt('li', TableUtils.LIST_ITEM_CLS, TableUtils.TABLE_ROW_HEIGHT_OPTS_CLS);
+      const rowHeightWrapperElt = DomUtils.createElt(
+        'li',
+        TableUtils.LIST_ITEM_CLS,
+        TableUtils.TABLE_ROW_HEIGHT_OPTS_CLS
+      );
 
-      const rowHeightItemElt = (cellPadding: 4 | 8 | 16): HTMLElement => {
+      const rowHeightElt = (cellPadding: 4 | 8 | 16): HTMLElement => {
         const rowHeightCls =
           cellPadding === 4
             ? TableUtils.CONDENSED_CLS
@@ -917,10 +921,11 @@ export abstract class AbstractTable<T> {
         return elt;
       };
 
-      rowHeightElt.appendChild(rowHeightItemElt(4));
-      rowHeightElt.appendChild(rowHeightItemElt(8));
-      rowHeightElt.appendChild(rowHeightItemElt(16));
-      listElt.appendChild(rowHeightElt);
+      rowHeightWrapperElt.appendChild(rowHeightElt(4));
+      rowHeightWrapperElt.appendChild(rowHeightElt(8));
+      rowHeightWrapperElt.appendChild(rowHeightElt(16));
+      listElt.appendChild(rowHeightWrapperElt);
+
       overlayElt.appendChild(listElt);
 
       // Set overlay position and size
