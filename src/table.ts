@@ -33,7 +33,6 @@ export abstract class AbstractTable<T> {
   private prevRangeStart: number | null;
   private rowActionsButtonCellWidth: number;
   private selectedNodeIds: number[];
-  private tickCellWidth: number;
 
   protected constructor(
     containerElt: HTMLElement,
@@ -53,7 +52,6 @@ export abstract class AbstractTable<T> {
     this.prevRangeStart = null;
     this.rowActionsButtonCellWidth = 0;
     this.selectedNodeIds = [];
-    this.tickCellWidth = 0;
     this.virtualNodesCount = this.options.visibleNodes + AbstractTable.VIRTUAL_SCROLL_PADDING;
     this.visibleNodeIndexes = [];
 
@@ -282,7 +280,6 @@ export abstract class AbstractTable<T> {
     this.containerElt.appendChild(this.tableElt);
 
     this.rowActionsButtonCellWidth = this.computeRowActionsButtonCellWidth();
-    this.tickCellWidth = this.computeTickCellWidth();
 
     this.setStickyColumnsPosition();
   }
@@ -375,16 +372,6 @@ export abstract class AbstractTable<T> {
     }
 
     return rowActionsButtonCellWidth;
-  }
-
-  private computeTickCellWidth(): number {
-    let tickCellWidth = 0;
-
-    if (this.isSelectionEnabled()) {
-      tickCellWidth = DomUtils.getComputedWidth(this.tableHeaderRowElt.firstElementChild as Element);
-    }
-
-    return tickCellWidth;
   }
 
   private convertToPixel({ value, unit }: { value: number; unit: ColumnWidthUnit }): number {
@@ -1160,7 +1147,7 @@ export abstract class AbstractTable<T> {
       const tableHeaderCellElt = tableHeaderCellElts[i];
 
       if (column.pinned === 'left') {
-        let offset = this.tickCellWidth;
+        let offset = 0;
         for (let j = 0; j < i; j++) {
           offset += stickyDataColumnsWidth[j];
         }
