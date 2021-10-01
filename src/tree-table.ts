@@ -333,6 +333,6 @@ export class TreeTable<T> extends AbstractTable<T> {
       aux(node, i);
     });
 
-    this.updateNodes();
+    this.updateNodes({ forceTableRendering: true });
   }
 }
