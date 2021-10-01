@@ -401,8 +401,8 @@ export abstract class AbstractTable<T> {
     }
   }
 
-  private createOverlayElt({ onClose }: { onClose?: () => void } = {}): HTMLElement {
-    const overlayElt = DomUtils.createElt('div', TableUtils.OVERLAY_CLS);
+  private createOverlayElt({ classList, onClose }: { classList?: string[]; onClose?: () => void } = {}): HTMLElement {
+    const overlayElt = DomUtils.createElt('div', TableUtils.OVERLAY_CLS, ...(classList ?? []));
 
     const listener = (event: Event): void => {
       this.containerElt.removeChild(overlayElt);
@@ -505,7 +505,7 @@ export abstract class AbstractTable<T> {
     elt.addEventListener('mouseup', () => this.onClickTableBodyRow(ctx.nodeIndex), false);
 
     if (this.isSelectionEnabled()) {
-      elt.appendChild(this.createTableBodyTickElt());
+      elt.appendChild(this.createTableTickElt());
     }
 
     this.dataColumns.forEach((column) => elt.appendChild(this.createTableBodyCellElt(column, ctx)));
@@ -521,14 +521,6 @@ export abstract class AbstractTable<T> {
     return [...Array(this.virtualNodesCount).keys()].map((_, i) => this.createTableBodyRowElt({ nodeIndex: i }));
   }
 
-  private createTableBodyTickElt(): HTMLElement {
-    const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_TICK_CLS);
-
-    elt.appendChild(DomUtils.createElt('i'));
-
-    return elt;
-  }
-
   private createTableBodyWrapperElt(): HTMLElement {
     const elt = DomUtils.createElt('div');
 
@@ -541,16 +533,6 @@ export abstract class AbstractTable<T> {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_CLS, ...(this.options.classList ?? []));
 
     elt.addEventListener('scroll', () => requestAnimationFrame(() => this.updateVisibleNodes()));
-
-    if (this.isSelectionEnabled()) {
-      if (this.options.selectable === true) {
-        elt.classList.add(TableUtils.SELECTION_ALL_CLS);
-      } else if (this.options.selectable === 1) {
-        elt.classList.add(TableUtils.SELECTION_SINGLE_CLS);
-      } else {
-        elt.classList.add(TableUtils.SELECTION_MULTIPLE_CLS);
-      }
-    }
 
     if (this.dataColumns.some((column) => column.title != null && column.title !== '')) {
       elt.appendChild(this.tableHeaderElt);
@@ -623,7 +605,15 @@ export abstract class AbstractTable<T> {
     const elt = DomUtils.createElt('div', TableUtils.TABLE_ROW_CLS);
 
     if (this.isSelectionEnabled()) {
-      elt.appendChild(this.createTableHeaderTickElt());
+      const tickElt = this.createTableTickElt();
+
+      if (this.options.selectable === true) {
+        tickElt.addEventListener('mouseup', () => this.onClickTableHeaderTick());
+      } else {
+        tickElt.classList.add(TableUtils.DISABLED_CLS);
+      }
+
+      elt.appendChild(tickElt);
     }
 
     this.dataColumns.forEach((column, i) => elt.appendChild(this.createTableHeaderCellElt(column, { columnIndex: i })));
@@ -645,23 +635,21 @@ export abstract class AbstractTable<T> {
     return elt;
   }
 
-  private createTableHeaderTickElt(): HTMLElement {
-    const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_TICK_CLS);
-
-    if (this.options.selectable === true) {
-      elt.addEventListener('mouseup', () => this.onClickTableHeaderTick());
-
-      elt.appendChild(DomUtils.createElt('i'));
-    }
-
-    return elt;
-  }
-
   private createTableHeaderTitleElt(column: Column<T>): HTMLElement {
     const elt = DomUtils.createElt('span', TableUtils.TABLE_HEADER_TITLE_CLS);
     elt.textContent = column.title ?? '';
 
     this.addTooltip(elt, elt.textContent);
+
+    return elt;
+  }
+
+  private createTableTickElt(): HTMLElement {
+    const elt = DomUtils.createElt('div', TableUtils.TABLE_CELL_TICK_CLS);
+
+    elt.appendChild(
+      DomUtils.createElt('i', this.options.selectable === 1 ? TableUtils.RADIO_CLS : TableUtils.CHECKBOX_CLS)
+    );
 
     return elt;
   }
