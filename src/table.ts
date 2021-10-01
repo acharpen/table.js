@@ -1128,9 +1128,9 @@ export abstract class AbstractTable<T> {
   private setColumnWidth(columnIndex: number, width: number): void {
     const widthInPx = DomUtils.withPx(width);
 
-    this.getDataCellElts(this.tableHeaderRowElt)[columnIndex].style.minWidth = widthInPx;
+    this.getDataCellElts(this.tableHeaderRowElt)[columnIndex].style.width = widthInPx;
     for (let i = 0, len = this.tableBodyRowElts.length; i < len; i++) {
-      this.getDataCellElts(this.tableBodyRowElts[i])[columnIndex].style.minWidth = widthInPx;
+      this.getDataCellElts(this.tableBodyRowElts[i])[columnIndex].style.width = widthInPx;
     }
   }
 
