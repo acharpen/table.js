@@ -362,6 +362,23 @@ export abstract class AbstractTable<T> {
 
   // ////////////////////////////////////////////////////////////////////////////
 
+  private addTooltip(elt: HTMLElement, textContent: string): void {
+    elt.addEventListener('mouseenter', () => {
+      const { bottom, left } = elt.getBoundingClientRect();
+
+      const tooltipElt = DomUtils.createElt('div', TableUtils.TOOLTIP_CLS);
+      tooltipElt.textContent = textContent;
+      tooltipElt.style.left = DomUtils.withPx(left);
+      tooltipElt.style.top = DomUtils.withPx(bottom);
+
+      this.containerElt.appendChild(tooltipElt);
+    });
+
+    elt.addEventListener('mouseleave', () => {
+      this.containerElt.removeChild(this.containerElt.lastChild as ChildNode);
+    });
+  }
+
   private computeRowActionsButtonCellWidth(): number {
     let rowActionsButtonCellWidth = 0;
 
@@ -642,8 +659,9 @@ export abstract class AbstractTable<T> {
 
   private createTableHeaderTitleElt(column: Column<T>): HTMLElement {
     const elt = DomUtils.createElt('span', TableUtils.TABLE_HEADER_TITLE_CLS);
-
     elt.textContent = column.title ?? '';
+
+    this.addTooltip(elt, elt.textContent);
 
     return elt;
   }

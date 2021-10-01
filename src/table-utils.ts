@@ -41,6 +41,7 @@ export class TableUtils {
   public static readonly TABLE_ROW_ACTIONS_HANDLE_CLS: string = `${TableUtils.VENDOR_CLS}-row-actions-btn`;
   public static readonly TABLE_ROW_HEIGHT_OPTS_CLS: string = `${TableUtils.VENDOR_CLS}-row-height-opts`;
   public static readonly TABLE_ROW_CLS: string = `${TableUtils.VENDOR_CLS}-row`;
+  public static readonly TOOLTIP_CLS: string = `${TableUtils.VENDOR_CLS}-tooltip`;
   public static readonly UNSELECTABLE_CLS: string = `${TableUtils.VENDOR_CLS}-unselectable`;
   public static readonly VIRTUAL_SCROLL_SPACER_CLS: string = `${TableUtils.VENDOR_CLS}-virtual-scroll-spacer`;
 
