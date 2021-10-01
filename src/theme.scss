@@ -120,8 +120,6 @@ $table-header-height: 40px;
   i {
     border-style: solid;
     border-width: 0 2px 2px 0;
-
-    transition: border-color 0.25s ease-in;
   }
 }
 
@@ -300,6 +298,8 @@ $table-header-height: 40px;
   i {
     border-color: transparent;
     padding: 2px;
+
+    transition: border-color 0.25s ease-in;
   }
 }
 
