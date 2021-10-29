@@ -1,10 +1,9 @@
 export type TableOptions<T> = {
   columnMinWidth: number;
-  visibleNodes: number;
+  rowHeight: number;
+  visibleRowsCount: number;
 
-  classList?: string[];
   rowActions?: { callback: (item: T) => void; label: string }[][];
-  rowClassList?: (item: T, rowIndex: number) => string[];
   selectable?: boolean | number;
   selectableCheck?: (item: T) => boolean;
   selectableRollingSelection?: boolean;

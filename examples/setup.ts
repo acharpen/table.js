@@ -91,11 +91,12 @@ export const columnOptions = [
 
 export const tableOptions = {
   classList: ['oo-table-line-divisions'],
-  columnMinWidth: 80,
+  columnMinWidth: 100,
   rowActions: [
     [{ callback: () => console.log('First Action'), label: 'First Action' }],
     [{ callback: () => console.log('Second Action'), label: 'Second Action' }]
   ],
+  rowHeight: 48,
   selectable: true,
-  visibleNodes: 10
+  visibleRowsCount: 10
 };

@@ -9,7 +9,6 @@ export type ColumnOptions<T> = {
   id: number;
   order: number;
 
-  cellClassList?: (item: T, rowIndex: number) => string[];
   pinned?: 'left' | 'right';
   resizable?: boolean;
   sorter?: (a: T, b: T) => number;

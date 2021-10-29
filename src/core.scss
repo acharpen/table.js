@@ -21,6 +21,18 @@
   z-index: 2;
 }
 
+.oo-table-text-center .oo-table-cell-content {
+  text-align: center;
+}
+
+.oo-table-text-left .oo-table-cell-content {
+  text-align: left;
+}
+
+.oo-table-text-right .oo-table-cell-content {
+  text-align: right;
+}
+
 /* Header ****************************************************************** */
 
 .oo-table-header {
@@ -37,24 +49,4 @@
   .oo-table-row.oo-table-hidden {
     display: none;
   }
-
-  .oo-table-text-center {
-    text-align: center;
-  }
-
-  .oo-table-text-left {
-    text-align: left;
-  }
-
-  .oo-table-text-right {
-    text-align: right;
-  }
-}
-
-.oo-table-virtual-scroll-spacer {
-  left: 0;
-  position: absolute;
-  top: 0;
-  transform-origin: 0 0;
-  width: 1px;
 }

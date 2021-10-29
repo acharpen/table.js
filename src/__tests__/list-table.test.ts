@@ -8,7 +8,7 @@ const columnOptions = [
   { align: 'left' as const, formatter: { update: updateTextElt('col1') }, id: 1, order: 1, title: 'col1' },
   { align: 'left' as const, formatter: { update: updateTextElt('col2') }, id: 2, order: 2, title: 'col2' }
 ];
-const tableOptions = { columnMinWidth: 80, visibleNodes: 10 };
+const tableOptions = { columnMinWidth: 80, rowHeight: 48, visibleRowsCount: 10 };
 const table = new ListTable<TestObject>(document.body, { columnOptions, tableOptions });
 
 // ////////////////////////////////////////////////////////////////////////////

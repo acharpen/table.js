@@ -132,8 +132,8 @@ export class TreeTable<T> extends AbstractTable<T> {
     return elt;
   }
 
-  protected updateVisibleNodes(force = false): void {
-    super.updateVisibleNodes(force);
+  protected updateVisibleNodes(opts: { force: boolean } = { force: false }): void {
+    super.updateVisibleNodes(opts);
 
     for (let i = 0, len = this.visibleNodeIndexes.length; i < len; i++) {
       const firstCellElt = this.getDataCellElts(this.tableBodyRowElts[i])[0];

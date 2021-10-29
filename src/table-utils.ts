@@ -16,6 +16,7 @@ export class TableUtils {
   public static readonly LIST_ITEM_CLS = `${TableUtils.VENDOR_CLS}-list-item`;
   public static readonly MENU_BUTTON_CLS = `${TableUtils.VENDOR_CLS}-menu-btn`;
   public static readonly OVERLAY_CLS = `${TableUtils.VENDOR_CLS}-overlay`;
+  public static readonly PARTIALLY_SELECTED_CLS = `${TableUtils.VENDOR_CLS}-partially-selected`;
   public static readonly RADIO_CLS = `${TableUtils.VENDOR_CLS}-radio`;
   public static readonly REGULAR_CLS = `${TableUtils.VENDOR_CLS}-regular`;
   public static readonly RELAXED_CLS = `${TableUtils.VENDOR_CLS}-relaxed`;
@@ -34,16 +35,15 @@ export class TableUtils {
   public static readonly TABLE_BODY_CLS = `${TableUtils.VENDOR_CLS}-body`;
   public static readonly TABLE_CELL_CLS = `${TableUtils.VENDOR_CLS}-cell`;
   public static readonly TABLE_CELL_CONTENT_CLS = `${TableUtils.VENDOR_CLS}-cell-content`;
-  public static readonly TABLE_CELL_TICK_CLS = `${TableUtils.VENDOR_CLS}-cell-tick`;
   public static readonly TABLE_CLS = TableUtils.VENDOR_CLS;
   public static readonly TABLE_HEADER_CLS = `${TableUtils.VENDOR_CLS}-header`;
   public static readonly TABLE_HEADER_TITLE_CLS = `${TableUtils.VENDOR_CLS}-header-title`;
-  public static readonly TABLE_ROW_ACTIONS_HANDLE_CLS = `${TableUtils.VENDOR_CLS}-row-actions-btn`;
+  public static readonly TABLE_ROW_CONTEXT_MENU_CLS = `${TableUtils.VENDOR_CLS}-row-context-menu`;
   public static readonly TABLE_ROW_HEIGHT_OPTS_CLS = `${TableUtils.VENDOR_CLS}-row-height-opts`;
   public static readonly TABLE_ROW_CLS = `${TableUtils.VENDOR_CLS}-row`;
+  public static readonly TICKBOX_CLS = `${TableUtils.VENDOR_CLS}-tickbox`;
   public static readonly TOOLTIP_CLS = `${TableUtils.VENDOR_CLS}-tooltip`;
   public static readonly UNSELECTABLE_CLS = `${TableUtils.VENDOR_CLS}-unselectable`;
-  public static readonly VIRTUAL_SCROLL_SPACER_CLS = `${TableUtils.VENDOR_CLS}-virtual-scroll-spacer`;
 
   public static getTextAlignCls(align: string): string {
     return `${TableUtils.VENDOR_CLS}-text-${align}`;

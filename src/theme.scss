@@ -5,7 +5,6 @@
 $resize-handle-width: 8px;
 $scrollbar-height: 8px;
 $scrollbar-width: 8px;
-$sort-button-width: 16px;
 $table-border-radius: 4px;
 $table-cell-padding: 16px;
 $table-header-height: 40px;
@@ -24,16 +23,13 @@ $table-header-height: 40px;
 
 .oo-table-body {
   .oo-table-cell,
-  .oo-table-cell-tick,
-  .oo-table-menu-btn {
+  .oo-table-row {
     background-color: var(--oo-table-color-bg-primary);
   }
 }
 
 .oo-table-header {
   .oo-table-cell,
-  .oo-table-cell-tick,
-  .oo-table-menu-btn,
   .oo-table-row {
     background-color: var(--oo-table-color-box-header-blue-bg);
   }
@@ -50,31 +46,38 @@ $table-header-height: 40px;
 }
 
 .oo-table-body .oo-table-cell-content a,
-.oo-table-cell-tick:not(.oo-table-disabled),
-.oo-table-body .oo-table-menu-btn,
 .oo-table-expand-toggler,
 .oo-table-header .oo-table-cell,
-.oo-table-overlay ul li.oo-table-list-item {
+.oo-table-menu-btn,
+.oo-table-overlay ul li.oo-table-list-item,
+.oo-table-tickbox:not(.oo-table-disabled) {
   cursor: pointer;
 }
 
+.oo-table,
+.oo-table-row:hover .oo-table-tickbox i,
+.oo-table-expand-toggler i,
+.oo-table-header .oo-table-cell:hover .oo-table-sort-btn-asc i,
+.oo-table-header .oo-table-cell:hover .oo-table-sort-btn-desc i {
+  border-color: var(--oo-table-color-border-primary);
+}
+
 .oo-table-cell,
-.oo-table-cell-tick,
-.oo-table-cell-tick i,
-.oo-table-expand-toggler,
 .oo-table-menu-btn,
-.oo-table-resize-handle {
+.oo-table-expand-toggler,
+.oo-table-resize-handle,
+.oo-table-tickbox i {
   align-items: center;
   display: flex;
   flex-direction: row;
 }
 
-.oo-table,
-.oo-table-row:hover .oo-table-cell-tick i,
-.oo-table-expand-toggler i,
-.oo-table-header .oo-table-cell:hover .oo-table-sort-btn-asc i,
-.oo-table-header .oo-table-cell:hover .oo-table-sort-btn-desc i {
-  border-color: var(--oo-table-color-border-primary);
+.oo-table-menu-btn,
+.oo-table-row-context-menu,
+.oo-table-sort-btns,
+.oo-table-tickbox,
+.oo-table-tickbox i {
+  justify-content: center;
 }
 
 .oo-table,
@@ -82,20 +85,6 @@ $table-header-height: 40px;
 .oo-table-blocking,
 .oo-table-tooltip {
   border-radius: $table-border-radius;
-}
-
-.oo-table::-webkit-scrollbar-thumb,
-.oo-table-body .oo-table-menu-btn i,
-.oo-table-header .oo-table-cell:hover .oo-table-menu-btn i,
-.oo-table-header .oo-table-row:hover .oo-table-resize-handle::before {
-  background-color: var(--oo-table-color-border-primary);
-}
-
-.oo-table-body .oo-table-row.oo-table-selected .oo-table-cell,
-.oo-table-body .oo-table-row.oo-table-selected .oo-table-cell-tick,
-.oo-table-body .oo-table-row.oo-table-selected .oo-table-menu-btn,
-.oo-table-overlay ul li.oo-table-list-item:hover {
-  background-color: var(--oo-table-color-bg-tertiary);
 }
 
 .oo-table-expand-toggler:hover,
@@ -107,11 +96,25 @@ $table-header-height: 40px;
   }
 }
 
-.oo-table-cell-tick,
-.oo-table-cell-tick i,
-.oo-table-menu-btn,
-.oo-table-sort-btns {
-  justify-content: center;
+.oo-table-row.oo-table-partially-selected .oo-table-tickbox,
+.oo-table-row.oo-table-selected .oo-table-tickbox,
+.oo-table-sort-btn-asc.oo-table-active,
+.oo-table-sort-btn-desc.oo-table-active {
+  i {
+    border-color: var(--oo-table-color-text-primary) !important;
+  }
+}
+
+.oo-table::-webkit-scrollbar-thumb,
+.oo-table-header .oo-table-row:hover .oo-table-resize-handle::before,
+.oo-table-menu-btn i {
+  background-color: var(--oo-table-color-border-primary);
+}
+
+.oo-table-body .oo-table-row.oo-table-selected .oo-table-cell,
+.oo-table-body .oo-table-row.oo-table-selected .oo-table-menu-btn,
+.oo-table-overlay ul li.oo-table-list-item:hover {
+  background-color: var(--oo-table-color-bg-tertiary);
 }
 
 .oo-table-expand-toggler,
@@ -123,12 +126,10 @@ $table-header-height: 40px;
   }
 }
 
-.oo-table-row.oo-table-selected .oo-table-cell-tick,
-.oo-table-sort-btn-asc.oo-table-active,
-.oo-table-sort-btn-desc.oo-table-active {
-  i {
-    border-color: var(--oo-table-color-text-primary) !important;
-  }
+.oo-table-header .oo-table-row:hover .oo-table-resize-handle:hover::before,
+.oo-table-row.oo-table-partially-selected .oo-table-tickbox i::before,
+.oo-table-row.oo-table-selected .oo-table-tickbox i::before {
+  background-color: var(--oo-table-color-text-primary);
 }
 
 .oo-table,
@@ -154,14 +155,26 @@ $table-header-height: 40px;
   white-space: nowrap;
 }
 
-.oo-table-cell-tick,
-.oo-table-menu-btn {
-  width: 32px;
+.oo-table-checkbox,
+.oo-table-radio {
+  border: 1px solid transparent;
+  height: 16px;
+  width: 16px;
+
+  &::before {
+    content: "";
+  }
 }
 
-.oo-table-header .oo-table-row:hover .oo-table-resize-handle:hover::before,
-.oo-table-row.oo-table-selected .oo-table-cell-tick i::before {
-  background-color: var(--oo-table-color-text-primary);
+.oo-table-menu-btn,
+.oo-table-sort-btns {
+  width: 16px;
+}
+
+.oo-table-row-context-menu,
+.oo-table-tickbox {
+  padding: 0 !important;
+  width: 32px;
 }
 
 .oo-table {
@@ -183,7 +196,6 @@ $table-header-height: 40px;
 
   &.oo-table-line-divisions .oo-table-body {
     .oo-table-cell,
-    .oo-table-cell-tick,
     .oo-table-menu-btn {
       box-shadow: inset 0 -1px 0 0 var(--oo-table-color-border-secondary);
     }
@@ -212,41 +224,21 @@ $table-header-height: 40px;
   line-height: inherit;
 }
 
-.oo-table-cell-tick i {
-  border: 1px solid transparent;
-  height: 16px;
-  width: 16px;
+.oo-table-checkbox {
+  &,
+  &::before {
+    border-radius: 4px;
+  }
 
   &::before {
-    content: "";
-  }
-
-  &.oo-table-checkbox {
-    &,
-    &::before {
-      border-radius: 4px;
-    }
-
-    &::before {
-      height: 12px;
-      width: 12px;
-    }
-  }
-
-  &.oo-table-radio {
-    &,
-    &::before {
-      border-radius: 50%;
-    }
-
-    &::before {
-      height: 8px;
-      width: 8px;
-    }
+    height: 12px;
+    width: 12px;
   }
 }
 
 .oo-table-menu-btn {
+  height: 16px;
+
   &:hover,
   &.oo-table-active {
     i {
@@ -283,6 +275,18 @@ $table-header-height: 40px;
   }
 }
 
+.oo-table-radio {
+  &,
+  &::before {
+    border-radius: 50%;
+  }
+
+  &::before {
+    height: 8px;
+    width: 8px;
+  }
+}
+
 .oo-table-spacer {
   flex-grow: 1;
 }
@@ -311,9 +315,9 @@ $table-header-height: 40px;
 }
 
 .oo-table-header {
-  .oo-table-cell-content {
-    display: flex;
-    flex-direction: row;
+  .oo-table-row.oo-table-partially-selected .oo-table-tickbox i.oo-table-checkbox::before {
+    height: 6px;
+    width: 6px;
   }
 
   .oo-table-text-center {
@@ -388,7 +392,7 @@ $table-header-height: 40px;
 }
 
 .oo-table-sort-btn-asc {
-  top: 4px;
+  bottom: 1px;
 
   i {
     transform: rotate(-135deg);
@@ -396,7 +400,7 @@ $table-header-height: 40px;
 }
 
 .oo-table-sort-btn-desc {
-  bottom: 4px;
+  top: 1px;
 
   i {
     transform: rotate(45deg);
@@ -407,11 +411,7 @@ $table-header-height: 40px;
   display: flex;
   flex-direction: row;
   position: relative;
-  width: $sort-button-width;
-}
-
-.oo-table-text-right .oo-table-header-title + div {
-  margin-right: 8px;
+  width: 16px;
 }
 
 /* Body ******************************************************************** */
@@ -429,15 +429,13 @@ $table-header-height: 40px;
     &,
     &.oo-table-selected {
       &:hover {
-        .oo-table-cell,
-        .oo-table-cell-tick,
-        .oo-table-menu-btn {
+        .oo-table-cell {
           background-color: var(--oo-table-color-border-secondary);
         }
       }
     }
 
-    &.oo-table-unselectable .oo-table-cell-tick i {
+    &.oo-table-unselectable .oo-table-tickbox i {
       cursor: not-allowed;
     }
   }
@@ -471,7 +469,7 @@ $table-header-height: 40px;
   }
 }
 
-.oo-table-row-actions-btn {
+.oo-table-row-context-menu {
   @extend .oo-table-sticky;
 
   right: 0;

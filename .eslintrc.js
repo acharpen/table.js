@@ -190,7 +190,7 @@ module.exports = {
         selector: 'variable',
         types: ['boolean'],
         format: ['PascalCase'],
-        prefix: ['is', 'should', 'has', 'can', 'did', 'will']
+        prefix: ['are', 'can', 'did', 'has', 'is', 'should', 'will']
       }
     ],
     '@typescript-eslint/no-base-to-string': ['error'],
